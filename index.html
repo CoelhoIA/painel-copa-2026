@@ -424,14 +424,29 @@ a{color:inherit;text-decoration:none;}
 <div class="scrim" id="pixScrim" style="align-items:center;padding:16px;">
   <div class="pix-sheet">
     <h3>Pague com <span style="color:var(--pitch)">Pix</span></h3>
-    <div class="ps">Escaneie o QR Code com o app do seu banco<br>ou use o copia-e-cola. Valor: <b style="color:var(--text)">R$ 10,00</b></div>
-    <div class="pix-qr"><img id="pixQrImg" alt="QR Code Pix"></div>
-    <div class="pix-code-row">
-      <input id="pixCode" readonly>
-      <button class="btn-gold" id="pixCopyBtn" onclick="copyPixCode()" style="border-radius:10px;padding:11px;">Copiar código Pix</button>
+
+    <!-- Etapa 1: e-mail -->
+    <div id="pixStep1">
+      <div class="ps">Informe seu e-mail para gerar o Pix.<br>Valor: <b style="color:var(--text)">R$ 10,00</b> — pagamento único</div>
+      <div class="pix-code-row">
+        <input id="pixEmail" type="email" placeholder="seu@email.com" style="font-family:'Inter';font-size:14px;color:var(--text);">
+        <button class="btn-gold" id="pixGenBtn" onclick="genPix()" style="border-radius:10px;padding:11px;">Gerar QR Code Pix</button>
+      </div>
+      <div class="pix-status" id="pixErr"></div>
     </div>
-    <div class="pix-status" id="pixStatus">Aguardando pagamento...</div>
-    <div class="ps" style="margin-bottom:0;">A confirmação é automática — assim que pagar,<br>o painel completo abre sozinho. ⚡</div>
+
+    <!-- Etapa 2: QR Code -->
+    <div id="pixStep2" style="display:none;">
+      <div class="ps">Escaneie o QR Code com o app do seu banco<br>ou use o copia-e-cola.</div>
+      <div class="pix-qr"><img id="pixQrImg" alt="QR Code Pix"></div>
+      <div class="pix-code-row">
+        <input id="pixCode" readonly>
+        <button class="btn-gold" id="pixCopyBtn" onclick="copyPixCode()" style="border-radius:10px;padding:11px;">Copiar código Pix</button>
+      </div>
+      <div class="pix-status" id="pixStatus">Aguardando pagamento...</div>
+      <div class="ps" style="margin-bottom:0;">A confirmação é automática — assim que pagar,<br>o painel completo abre sozinho. ⚡</div>
+    </div>
+
     <button class="pix-close" onclick="closePixModal()">Fechar</button>
   </div>
 </div>
@@ -613,27 +628,45 @@ function showPanel(){
 }
 
 let pixPollTimer=null;
-async function handleBuy(btn){
+function handleBuy(){
+  // Abre o modal na etapa do e-mail
+  document.getElementById('pixStep1').style.display='block';
+  document.getElementById('pixStep2').style.display='none';
+  document.getElementById('pixErr').textContent='';
+  document.getElementById('pixScrim').classList.add('on');
+  setTimeout(()=>document.getElementById('pixEmail').focus(),100);
+}
+
+async function genPix(){
+  const email=document.getElementById('pixEmail').value.trim();
+  const err=document.getElementById('pixErr');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Digite um e-mail válido.';return;}
+  const btn=document.getElementById('pixGenBtn');
   const orig=btn.innerHTML;
-  btn.innerHTML='<span class="spinner"></span>Gerando Pix...';
-  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Gerando...';
+  btn.disabled=true;err.textContent='';
   try{
-    const res=await fetch('/api/create-checkout',{method:'POST'});
+    const res=await fetch('/api/create-checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email})
+    });
     const data=await res.json();
     if(!data.brCode) throw new Error(data.error||'Erro');
     openPixModal(data);
   }catch(e){
-    alert('Erro ao gerar o Pix. Tente novamente em instantes.');
+    err.textContent='Erro ao gerar o Pix. Tente novamente.';
   }
   btn.innerHTML=orig;
   btn.disabled=false;
 }
 
 function openPixModal(pix){
+  document.getElementById('pixStep1').style.display='none';
+  document.getElementById('pixStep2').style.display='block';
   document.getElementById('pixQrImg').src=pix.brCodeBase64;
   document.getElementById('pixCode').value=pix.brCode;
   document.getElementById('pixStatus').textContent='Aguardando pagamento...';
-  document.getElementById('pixScrim').classList.add('on');
 
   // Poll a cada 4s até confirmar
   clearInterval(pixPollTimer);
