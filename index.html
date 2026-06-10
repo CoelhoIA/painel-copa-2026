@@ -524,14 +524,31 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="pix-sheet">
     <h3>Pague com <span style="color:var(--pitch)">Pix</span></h3>
 
-    <!-- Etapa 1: e-mail -->
-    <div id="pixStep1">
-      <div class="ps">Informe seu e-mail para gerar o Pix.<br>Valor: <b style="color:var(--text)">R$ 10,00</b> — pagamento único</div>
-      <div class="pix-code-row">
-        <input id="pixEmail" type="email" placeholder="seu@email.com" style="font-family:'Inter';font-size:14px;color:var(--text);">
-        <button class="btn-gold" id="pixGenBtn" onclick="genPix()" style="border-radius:10px;padding:11px;">Gerar QR Code Pix</button>
+    <!-- Etapa 1: confirmação de compra -->
+    <div id="pixStep1" style="text-align:left;">
+      <div class="ps" style="text-align:center;">Valor: <b style="color:var(--text)">R$ 10,00</b> — pagamento único via Pix</div>
+
+      <div style="background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12px;color:var(--dim);line-height:1.6;margin-bottom:12px;">
+        <b style="color:var(--flood)">ℹ️ Como funciona:</b> você está adquirindo o <b style="color:var(--text)">acesso, até 27/06/2026, aos placares e probabilidades gerados pela IA Claude</b> a partir de um simulador estatístico (modelo de Poisson calibrado pelo ranking FIFA). Não é casa de apostas: não recebemos apostas nem pagamos prêmios — e nenhum resultado é garantido.
       </div>
-      <div class="pix-status" id="pixErr"></div>
+
+      <div class="pix-code-row">
+        <input id="pixEmail" type="email" placeholder="seu@email.com" style="font-family:'Inter';font-size:14px;color:var(--text);" oninput="checkBuyForm()">
+        <input id="pixEmail2" type="email" placeholder="confirme seu e-mail" style="font-family:'Inter';font-size:14px;color:var(--text);" oninput="checkBuyForm()">
+      </div>
+
+      <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;margin:10px 0 8px;cursor:pointer;color:var(--dim);">
+        <input type="checkbox" id="buyTerms" style="margin-top:2px;" onchange="checkBuyForm()">
+        <span>Li e aceito os <a href="#" onclick="document.getElementById('termsScrim').classList.add('on');return false;" style="color:var(--flood);text-decoration:underline;">Termos de Uso</a> (acesso por período determinado, reembolso conforme art. 49 do CDC)</span>
+      </label>
+      <label style="display:flex;gap:9px;align-items:flex-start;font-size:12.5px;margin-bottom:12px;cursor:pointer;color:var(--dim);">
+        <input type="checkbox" id="buyAdult" style="margin-top:2px;" onchange="checkBuyForm()">
+        <span>🔞 Confirmo que tenho <b style="color:var(--text)">18 anos ou mais</b></span>
+      </label>
+
+      <button class="btn-gold" id="pixGenBtn" onclick="genPix()" disabled
+        style="border-radius:10px;padding:12px;width:100%;opacity:.4;cursor:not-allowed;">Pagar R$ 10 via Pix</button>
+      <div class="pix-status" id="pixErr" style="text-align:center;"></div>
     </div>
 
     <!-- Etapa 2: QR Code -->
@@ -797,10 +814,30 @@ function handleBuy(){
   setTimeout(()=>document.getElementById('pixEmail').focus(),100);
 }
 
+function buyFormOk(){
+  const e1=document.getElementById('pixEmail').value.trim().toLowerCase();
+  const e2=document.getElementById('pixEmail2').value.trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e1) && e1===e2
+    && document.getElementById('buyTerms').checked
+    && document.getElementById('buyAdult').checked;
+}
+function checkBuyForm(){
+  const btn=document.getElementById('pixGenBtn');
+  const err=document.getElementById('pixErr');
+  const e1=document.getElementById('pixEmail').value.trim().toLowerCase();
+  const e2=document.getElementById('pixEmail2').value.trim().toLowerCase();
+  if(e1&&e2&&e1!==e2){err.textContent='Os e-mails não conferem.';}
+  else{err.textContent='';}
+  const ok=buyFormOk();
+  btn.disabled=!ok;
+  btn.style.opacity=ok?'1':'.4';
+  btn.style.cursor=ok?'pointer':'not-allowed';
+}
+
 async function genPix(){
   const email=document.getElementById('pixEmail').value.trim();
   const err=document.getElementById('pixErr');
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Digite um e-mail válido.';return;}
+  if(!buyFormOk()){err.textContent='Preencha os e-mails iguais e marque as duas confirmações.';return;}
   const btn=document.getElementById('pixGenBtn');
   const orig=btn.innerHTML;
   btn.innerHTML='<span class="spinner"></span>Gerando...';
