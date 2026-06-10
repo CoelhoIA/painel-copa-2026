@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
         transaction_amount: 10,
         description: 'PalpitAI Copa 2026 — Acesso Completo',
         payment_method_id: 'pix',
+        external_reference: email.toLowerCase(),
         payer: { email }
       })
     });

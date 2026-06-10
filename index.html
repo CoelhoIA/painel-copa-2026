@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PalpitAI — Copa 2026 com Ciência</title>
+<title>PalpitAI — Copa 2026 · Palpites com IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -16,6 +16,19 @@
 body{background:var(--ink);color:var(--text);font-family:'Inter',sans-serif;line-height:1.5;}
 a{color:inherit;text-decoration:none;}
 
+/* Faixa tricolor futurista no topo: Brasil + sedes MX/EUA/CA */
+body::after{content:'';position:fixed;top:0;left:0;right:0;height:4px;z-index:99;
+  background:linear-gradient(90deg,#009C3B 0%,#FFDF00 25%,#2BD96A 45%,#CE1126 65%,#fff 80%,#3C3B6E 100%);}
+
+/* Glows de estádio: verde-amarelo (torcida BR) + vermelho/azul (sedes) */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(620px 420px at 12% -5%, rgba(255,223,0,.10), transparent 60%),
+    radial-gradient(560px 400px at 88% 4%, rgba(0,156,59,.12), transparent 60%),
+    radial-gradient(500px 420px at 8% 100%, rgba(206,17,38,.07), transparent 60%),
+    radial-gradient(560px 420px at 95% 96%, rgba(60,59,110,.16), transparent 60%);}
+#landing,#panel{position:relative;z-index:1;}
+
 /* ===== LANDING ===== */
 #landing{max-width:720px;margin:0 auto;padding:0 16px 60px;}
 
@@ -25,15 +38,22 @@ a{color:inherit;text-decoration:none;}
   color:var(--flood);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600;letter-spacing:.5px;margin-bottom:18px;}
 .hero h1{font-family:'Archivo Narrow',sans-serif;font-size:clamp(32px,7vw,52px);font-weight:700;
   line-height:1.1;margin-bottom:16px;}
-.hero h1 .accent{color:var(--flood);}
+.hero h1 .accent{background:linear-gradient(95deg,#FFDF00 10%,#2BD96A 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 14px rgba(43,217,106,.45));}
 .hero-sub{color:var(--dim);font-size:15px;max-width:480px;margin:0 auto 28px;line-height:1.6;}
+.hero-torcida{margin-top:18px;font-size:12.5px;color:var(--dim);letter-spacing:.3px;}
+.recover-link{background:none;border:none;color:var(--slate);font-size:12px;cursor:pointer;
+  font-family:inherit;text-decoration:underline;margin-top:10px;}
+.recover-link:hover{color:var(--text);}
 .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 .btn-outline{background:transparent;border:2px solid var(--line);color:var(--text);border-radius:12px;
   padding:12px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;}
 .btn-outline:hover{border-color:var(--dim);}
-.btn-gold{background:var(--flood);color:#1a1300;border:none;border-radius:12px;
-  padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;}
-.btn-gold:hover{filter:brightness(1.08);}
+.btn-gold{background:linear-gradient(95deg,#F5B433,#FFDF00);color:#1a1300;border:none;border-radius:12px;
+  padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;
+  box-shadow:0 0 20px rgba(245,180,51,.30);}
+.btn-gold:hover{filter:brightness(1.08);box-shadow:0 0 28px rgba(245,180,51,.45);}
 .btn-gold:active,.btn-outline:active{transform:scale(.97);}
 
 /* Animated explainer */
@@ -224,13 +244,15 @@ a{color:inherit;text-decoration:none;}
 
   <!-- Hero -->
   <section class="hero">
-    <div class="hero-badge">⚽ Copa do Mundo 2026 · 48 seleções · 72 jogos</div>
-    <h1>Palpites com <span class="accent">Ciência</span>,<br>não com sorte</h1>
-    <p class="hero-sub">Modelo estatístico que analisa cada jogo da fase de grupos e indica o placar mais provável, goleadores e chances de cada seleção — antes do apito inicial.</p>
+    <div class="hero-badge">🏆 Copa do Mundo 2026 · 🇲🇽 🇺🇸 🇨🇦 · 48 seleções · 72 jogos</div>
+    <h1>Palpites com <span class="accent">IA</span>,<br>não com sorte</h1>
+    <p class="hero-sub">Inteligência artificial + estatística analisando cada jogo da fase de grupos: placar mais provável, goleadores e chances de cada seleção — antes do apito inicial.</p>
     <div class="hero-btns">
       <button class="btn-outline" onclick="document.getElementById('demo-section').scrollIntoView({behavior:'smooth'})">Ver demonstração grátis ↓</button>
       <button class="btn-gold" id="buyBtnHero">Acesso completo — R$10 →</button>
     </div>
+    <div class="hero-torcida">🇧🇷 Feito no Brasil, para a nossa torcida 💚💛</div>
+    <button class="recover-link" onclick="openRecover()">Já comprei — recuperar meu acesso</button>
   </section>
 
   <!-- Animated explainer -->
@@ -240,7 +262,7 @@ a{color:inherit;text-decoration:none;}
       <div class="slide">
         <div class="slide-icon">📊⚽</div>
         <h3>O que é o PalpitAI?</h3>
-        <p>Um painel que usa <strong>matemática real</strong> para prever o que vai acontecer nos jogos da Copa 2026 — antes do apito inicial.</p>
+        <p>Um painel que usa <strong>IA e matemática real</strong> para prever o que vai acontecer nos jogos da Copa 2026 — antes do apito inicial.</p>
       </div>
       <div class="slide">
         <div class="slide-icon">🧮</div>
@@ -335,7 +357,8 @@ a{color:inherit;text-decoration:none;}
         <li><span class="check">✅</span> Ajuste manual de força por seleção</li>
       </ul>
       <button class="btn-gold full" id="buyBtnPrice" style="font-size:15px;border-radius:12px;padding:14px;">Comprar agora — R$10</button>
-      <p class="price-note">🔒 Pagamento via Pix — QR Code ou copia-e-cola · Confirmação na hora<br>Acesso salvo neste dispositivo/navegador</p>
+      <p class="price-note">🔒 Pagamento via Pix — QR Code ou copia-e-cola · Confirmação na hora<br>Trocou de aparelho? Recupere o acesso com o e-mail da compra</p>
+      <button class="recover-link" onclick="openRecover()">Já comprei — recuperar meu acesso</button>
     </div>
   </section>
 
@@ -418,6 +441,20 @@ a{color:inherit;text-decoration:none;}
     <button class="btn flood full" id="howClose">Entendi</button>
   </div>
 </div>
+</div>
+
+<!-- Recover access modal -->
+<div class="scrim" id="recScrim" style="align-items:center;padding:16px;">
+  <div class="pix-sheet">
+    <h3>Recuperar <span style="color:var(--pitch)">acesso</span></h3>
+    <div class="ps">Já comprou? Digite o e-mail usado na compra.<br>Vamos localizar seu pagamento e liberar o painel neste dispositivo.</div>
+    <div class="pix-code-row">
+      <input id="recEmail" type="email" placeholder="seu@email.com" style="font-family:'Inter';font-size:14px;color:var(--text);">
+      <button class="btn-gold" id="recBtn" onclick="recoverAccess()" style="border-radius:10px;padding:11px;">Recuperar acesso</button>
+    </div>
+    <div class="pix-status" id="recErr"></div>
+    <button class="pix-close" onclick="document.getElementById('recScrim').classList.remove('on')">Fechar</button>
+  </div>
 </div>
 
 <!-- Pix payment modal -->
@@ -613,12 +650,54 @@ const TOKEN_KEY='wc26_access_token';
 async function boot(){
   await loadState();
 
-  // Check existing token
+  // Valida o token salvo contra o Mercado Pago (pagamento real aprovado?)
   const token=localStorage.getItem(TOKEN_KEY);
-  if(token){showPanel();return;}
+  if(token){
+    let ok=true;
+    try{
+      const r=await fetch('/api/verify-payment?payment_id='+encodeURIComponent(token));
+      if(r.ok){const d=await r.json();ok=d.valid===true;}
+    }catch(e){} // sem internet/API fora: não trava quem pagou
+    if(ok){showPanel();return;}
+    localStorage.removeItem(TOKEN_KEY);
+  }
 
   // Show landing
   renderDemo();
+}
+
+// ----- Recuperar acesso por e-mail -----
+function openRecover(){
+  document.getElementById('recErr').textContent='';
+  document.getElementById('recScrim').classList.add('on');
+  setTimeout(()=>document.getElementById('recEmail').focus(),100);
+}
+async function recoverAccess(){
+  const email=document.getElementById('recEmail').value.trim();
+  const err=document.getElementById('recErr');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){err.textContent='Digite um e-mail válido.';return;}
+  const btn=document.getElementById('recBtn');
+  const orig=btn.innerHTML;
+  btn.innerHTML='<span class="spinner"></span>Buscando...';
+  btn.disabled=true;err.textContent='';
+  try{
+    const res=await fetch('/api/recover-access?email='+encodeURIComponent(email));
+    const data=await res.json();
+    if(data.valid&&data.token){
+      localStorage.setItem(TOKEN_KEY,data.token);
+      err.style.color='var(--pitch)';
+      err.textContent='✅ Compra encontrada! Liberando...';
+      setTimeout(()=>{document.getElementById('recScrim').classList.remove('on');showPanel();},1000);
+    }else{
+      err.style.color='var(--loss)';
+      err.textContent='Nenhuma compra aprovada encontrada com esse e-mail.';
+    }
+  }catch(e){
+    err.style.color='var(--loss)';
+    err.textContent='Erro ao consultar. Tente novamente.';
+  }
+  btn.innerHTML=orig;
+  btn.disabled=false;
 }
 
 function showPanel(){
