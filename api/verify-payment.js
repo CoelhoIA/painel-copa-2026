@@ -6,12 +6,13 @@ module.exports = async (req, res) => {
   if (!payment_id) return res.status(400).json({ error: 'Missing payment_id' });
 
   try {
-    const response = await fetch(`https://api.mercadopago.com/v1/payments/${payment_id}`, {
-      headers: { 'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}` }
-    });
+    const response = await fetch(
+      `https://api.abacatepay.com/v2/transparents/check?id=${encodeURIComponent(payment_id)}`,
+      { headers: { 'Authorization': `Bearer ${process.env.ABACATEPAY_API_KEY}` } }
+    );
     const data = await response.json();
-    const valid = data.status === 'approved';
-    res.status(200).json({ valid });
+    const status = data.status || (data.data && data.data.status);
+    res.status(200).json({ valid: status === 'PAID', status });
   } catch (err) {
     res.status(400).json({ valid: false, error: err.message });
   }

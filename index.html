@@ -196,6 +196,20 @@ a{color:inherit;text-decoration:none;}
 .resin .x{font-family:'Archivo Narrow';font-size:18px;color:var(--dim);}
 .full{width:100%;text-align:center;margin-top:6px;padding:12px;}
 
+/* Pix modal */
+.pix-sheet{background:var(--panel);border:1px solid var(--line);border-radius:20px;width:100%;max-width:400px;
+  padding:26px 22px;text-align:center;margin:auto;}
+.pix-sheet h3{font-family:'Archivo Narrow';font-weight:700;font-size:22px;margin-bottom:4px;}
+.pix-sheet .ps{color:var(--dim);font-size:12.5px;margin-bottom:16px;}
+.pix-qr{background:#fff;border-radius:14px;padding:12px;display:inline-block;margin-bottom:14px;}
+.pix-qr img{display:block;width:210px;height:210px;}
+.pix-code-row{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.pix-code-row input{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:10px;
+  color:var(--dim);padding:10px 12px;font-size:11px;font-family:'Space Mono';overflow:hidden;text-overflow:ellipsis;}
+.pix-status{color:var(--flood);font-size:13px;font-weight:600;margin-bottom:12px;min-height:18px;}
+.pix-close{background:transparent;border:none;color:var(--dim);font-size:12.5px;cursor:pointer;
+  font-family:inherit;text-decoration:underline;margin-top:4px;}
+
 /* loading spinner */
 .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(26,19,0,.3);
   border-top-color:#1a1300;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
@@ -321,7 +335,7 @@ a{color:inherit;text-decoration:none;}
         <li><span class="check">✅</span> Ajuste manual de força por seleção</li>
       </ul>
       <button class="btn-gold full" id="buyBtnPrice" style="font-size:15px;border-radius:12px;padding:14px;">Comprar agora — R$10</button>
-      <p class="price-note">🔒 Pagamento seguro via Stripe · Cartão de crédito ou débito<br>Acesso salvo neste dispositivo/navegador</p>
+      <p class="price-note">🔒 Pagamento via Pix — QR Code ou copia-e-cola · Confirmação na hora<br>Acesso salvo neste dispositivo/navegador</p>
     </div>
   </section>
 
@@ -404,6 +418,22 @@ a{color:inherit;text-decoration:none;}
     <button class="btn flood full" id="howClose">Entendi</button>
   </div>
 </div>
+</div>
+
+<!-- Pix payment modal -->
+<div class="scrim" id="pixScrim" style="align-items:center;padding:16px;">
+  <div class="pix-sheet">
+    <h3>Pague com <span style="color:var(--pitch)">Pix</span></h3>
+    <div class="ps">Escaneie o QR Code com o app do seu banco<br>ou use o copia-e-cola. Valor: <b style="color:var(--text)">R$ 10,00</b></div>
+    <div class="pix-qr"><img id="pixQrImg" alt="QR Code Pix"></div>
+    <div class="pix-code-row">
+      <input id="pixCode" readonly>
+      <button class="btn-gold" id="pixCopyBtn" onclick="copyPixCode()" style="border-radius:10px;padding:11px;">Copiar código Pix</button>
+    </div>
+    <div class="pix-status" id="pixStatus">Aguardando pagamento...</div>
+    <div class="ps" style="margin-bottom:0;">A confirmação é automática — assim que pagar,<br>o painel completo abre sozinho. ⚡</div>
+    <button class="pix-close" onclick="closePixModal()">Fechar</button>
+  </div>
 </div>
 
 <script>
@@ -568,22 +598,6 @@ const TOKEN_KEY='wc26_access_token';
 async function boot(){
   await loadState();
 
-  // Check URL for Mercado Pago redirect
-  const params=new URLSearchParams(window.location.search);
-  const paymentId=params.get('payment_id');
-  const status=params.get('status') || params.get('collection_status');
-  if(paymentId && status==='approved'){
-    try{
-      const res=await fetch('/api/verify-payment?payment_id='+paymentId);
-      const data=await res.json();
-      if(data.valid){
-        localStorage.setItem(TOKEN_KEY,paymentId);
-        window.history.replaceState({},'','/');
-        showPanel();return;
-      }
-    }catch(e){}
-  }
-
   // Check existing token
   const token=localStorage.getItem(TOKEN_KEY);
   if(token){showPanel();return;}
@@ -598,20 +612,63 @@ function showPanel(){
   initPanel();
 }
 
+let pixPollTimer=null;
 async function handleBuy(btn){
   const orig=btn.innerHTML;
-  btn.innerHTML='<span class="spinner"></span>Aguarde...';
+  btn.innerHTML='<span class="spinner"></span>Gerando Pix...';
   btn.disabled=true;
   try{
     const res=await fetch('/api/create-checkout',{method:'POST'});
     const data=await res.json();
-    if(data.url){window.location.href=data.url;return;}
-    throw new Error(data.error||'Erro');
+    if(!data.brCode) throw new Error(data.error||'Erro');
+    openPixModal(data);
   }catch(e){
-    btn.innerHTML=orig;
-    btn.disabled=false;
-    alert('Erro ao iniciar pagamento. Tente novamente em instantes.');
+    alert('Erro ao gerar o Pix. Tente novamente em instantes.');
   }
+  btn.innerHTML=orig;
+  btn.disabled=false;
+}
+
+function openPixModal(pix){
+  document.getElementById('pixQrImg').src=pix.brCodeBase64;
+  document.getElementById('pixCode').value=pix.brCode;
+  document.getElementById('pixStatus').textContent='Aguardando pagamento...';
+  document.getElementById('pixScrim').classList.add('on');
+
+  // Poll a cada 4s até confirmar
+  clearInterval(pixPollTimer);
+  pixPollTimer=setInterval(async()=>{
+    try{
+      const res=await fetch('/api/verify-payment?payment_id='+encodeURIComponent(pix.id));
+      const data=await res.json();
+      if(data.valid){
+        clearInterval(pixPollTimer);
+        localStorage.setItem(TOKEN_KEY,pix.id);
+        document.getElementById('pixStatus').textContent='✅ Pagamento confirmado!';
+        setTimeout(()=>{
+          document.getElementById('pixScrim').classList.remove('on');
+          showPanel();
+        },1200);
+      }else if(data.status==='EXPIRED'){
+        clearInterval(pixPollTimer);
+        document.getElementById('pixStatus').textContent='⏰ Pix expirado. Feche e gere um novo.';
+      }
+    }catch(e){}
+  },4000);
+}
+
+function closePixModal(){
+  clearInterval(pixPollTimer);
+  document.getElementById('pixScrim').classList.remove('on');
+}
+
+function copyPixCode(){
+  const inp=document.getElementById('pixCode');
+  inp.select();inp.setSelectionRange(0,99999);
+  try{navigator.clipboard.writeText(inp.value);}catch(e){document.execCommand('copy');}
+  const b=document.getElementById('pixCopyBtn');
+  b.textContent='✅ Copiado!';
+  setTimeout(()=>{b.textContent='Copiar código Pix';},2000);
 }
 
 // Buy buttons
