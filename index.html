@@ -405,6 +405,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="toolbar">
     <button class="btn flood" id="editBtn">Ajustar seleções</button>
     <button class="btn" id="howBtn">Como funciona</button>
+    <button class="btn" id="alertsBtn">📬 Alertas por e-mail</button>
   </div>
   <div class="days" id="days"></div>
   <div id="matches"></div>
@@ -470,6 +471,33 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
     <div class="pix-status" id="recErr"></div>
     <button class="pix-close" onclick="document.getElementById('recScrim').classList.remove('on')">Fechar</button>
+  </div>
+</div>
+
+<!-- Alerts sheet -->
+<div class="scrim" id="alertsScrim">
+  <div class="sheet">
+    <h3>📬 Alertas por e-mail</h3>
+    <div class="sd">Serviço gratuito para quem tem acesso ao painel. Você escolhe o que recebe e cancela quando quiser.</div>
+    <input class="rsearch" id="alEmail" type="email" placeholder="seu@email.com">
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:10px;cursor:pointer;">
+      <input type="checkbox" id="alDigest" style="margin-top:3px;">
+      <span><b>Resumo a cada 6 horas</b> — jogos das últimas horas, próximos jogos e palpites congelados</span>
+    </label>
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:10px;cursor:pointer;">
+      <input type="checkbox" id="alBrazil" style="margin-top:3px;">
+      <span><b>🇧🇷 Grupo do Brasil</b> — informações específicas dos jogos do Grupo C (Brasil, Marrocos, Escócia e Haiti) em todos os resumos</span>
+    </label>
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:12px;cursor:pointer;">
+      <input type="checkbox" id="alAdult" style="margin-top:3px;">
+      <span><b>🔞 Confirmo que tenho 18 anos ou mais</b> (obrigatório)</span>
+    </label>
+    <div style="font-size:11px;color:var(--slate);line-height:1.6;margin-bottom:12px;">
+      O PalpitAI é uma ferramenta de análise estatística e <b style="color:var(--dim)">não é casa de apostas</b> — não recebemos apostas nem pagamos prêmios. Os alertas são informativos, sem garantia de resultado. Seu e-mail será usado exclusivamente para o envio dos alertas escolhidos (LGPD) e nunca será compartilhado. Para marcar jogos específicos e ser avisado <b style="color:var(--dim)">1h antes</b>, use o botão 🔔 em cada jogo do painel.
+    </div>
+    <div class="pix-status" id="alMsg" style="text-align:center;"></div>
+    <button class="btn flood full" id="alSave">Salvar alertas</button>
+    <button class="btn full" id="alUnsub">Cancelar inscrição</button>
   </div>
 </div>
 
@@ -913,6 +941,7 @@ function initPanel(){
   $('resetBtn').onclick=async()=>{R={...BASE};RESULTS={};FROZEN={};await saveRatings();await saveResults();await saveFrozen();renderDays();renderMatches();};
   // Revalida congelamentos e molduras periodicamente (sem precisar recarregar a página)
   setInterval(()=>{renderDays();renderMatches();},30*60*1000);
+  initAlerts();
   $('rsearch').oninput=e=>renderRateList(e.target.value);
   $('resSave').onclick=resSaveHandler;
   $('resClear').onclick=resClearHandler;
@@ -967,6 +996,7 @@ function renderMatches(){
         ${allSc.map(s=>`<div class="sc"><span class="who">${s[1]} <span>${FLAG[s[0]]}</span></span><span class="pb"><span class="pf" style="width:${pct(s[2])}%"></span></span><span class="pct">${pct(s[2])}%</span></div>`).join('')}
       </div></div>
       <div class="actions">
+        <button class="btn" data-watch="${id}" title="Receber e-mail 1h antes do jogo">${WATCH.includes(id)?'🔔 Aviso ativado':'🔕 Avisar 1h antes'}</button>
         <button class="btn" data-edit="${h}|${a}">Ajustar força</button>
         <button class="btn flood" data-res="${id}">${res?'Editar resultado':'Lançar resultado'}</button>
       </div>
@@ -974,6 +1004,83 @@ function renderMatches(){
   }).join('');
   document.querySelectorAll('[data-res]').forEach(b=>b.onclick=()=>openResult(b.dataset.res));
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openRates(b.dataset.edit.split('|')));
+  document.querySelectorAll('[data-watch]').forEach(b=>b.onclick=()=>toggleWatch(b.dataset.watch));
+}
+
+// ==================== ALERTAS POR E-MAIL ====================
+let WATCH=[];
+try{WATCH=JSON.parse(localStorage.getItem('wc26_watch')||'[]');}catch(e){}
+const alertEmail=()=>localStorage.getItem('wc26_alert_email')||'';
+
+async function syncAlerts(extra){
+  const email=document.getElementById('alEmail').value.trim().toLowerCase();
+  const body={
+    email,
+    digest:document.getElementById('alDigest').checked,
+    brazil:document.getElementById('alBrazil').checked,
+    adult:document.getElementById('alAdult').checked,
+    watch:WATCH,
+    ...extra
+  };
+  const res=await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return res.json();
+}
+
+function openAlerts(){
+  document.getElementById('alEmail').value=alertEmail();
+  document.getElementById('alMsg').textContent='';
+  document.getElementById('alertsScrim').classList.add('on');
+}
+
+async function toggleWatch(id){
+  if(!alertEmail()){openAlerts();document.getElementById('alMsg').textContent='Salve seu e-mail primeiro para ativar os avisos de jogo.';return;}
+  if(WATCH.includes(id))WATCH=WATCH.filter(x=>x!==id);else WATCH.push(id);
+  localStorage.setItem('wc26_watch',JSON.stringify(WATCH));
+  renderMatches();
+  try{
+    await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:alertEmail(),adult:true,
+        digest:localStorage.getItem('wc26_alert_digest')==='1',
+        brazil:localStorage.getItem('wc26_alert_brazil')==='1',
+        watch:WATCH})});
+  }catch(e){}
+}
+
+function initAlerts(){
+  $('alertsBtn').onclick=openAlerts;
+  $('alSave').onclick=async()=>{
+    const msg=document.getElementById('alMsg');
+    const email=document.getElementById('alEmail').value.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.textContent='Digite um e-mail válido.';return;}
+    if(!document.getElementById('alAdult').checked){msg.textContent='Confirme que você tem 18 anos ou mais.';return;}
+    msg.textContent='Salvando...';
+    try{
+      const r=await syncAlerts();
+      if(r.ok){
+        localStorage.setItem('wc26_alert_email',email);
+        localStorage.setItem('wc26_alert_digest',document.getElementById('alDigest').checked?'1':'0');
+        localStorage.setItem('wc26_alert_brazil',document.getElementById('alBrazil').checked?'1':'0');
+        msg.textContent='✅ Alertas salvos! Você pode marcar jogos com o 🔔.';
+      }else{msg.textContent=r.error||'Erro ao salvar.';}
+    }catch(e){msg.textContent='Erro de conexão. Tente novamente.';}
+  };
+  $('alUnsub').onclick=async()=>{
+    const msg=document.getElementById('alMsg');
+    const email=document.getElementById('alEmail').value.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.textContent='Digite o e-mail inscrito para cancelar.';return;}
+    msg.textContent='Cancelando...';
+    try{
+      const r=await syncAlerts({action:'unsubscribe'});
+      if(r.ok){
+        localStorage.removeItem('wc26_alert_email');
+        localStorage.removeItem('wc26_alert_digest');
+        localStorage.removeItem('wc26_alert_brazil');
+        WATCH=[];localStorage.setItem('wc26_watch','[]');
+        renderMatches();
+        msg.textContent='✅ Inscrição cancelada. Você não receberá mais e-mails.';
+      }else{msg.textContent=r.error||'Erro ao cancelar.';}
+    }catch(e){msg.textContent='Erro de conexão. Tente novamente.';}
+  };
 }
 
 function rateRow(team){
