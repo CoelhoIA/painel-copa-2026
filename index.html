@@ -368,7 +368,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <li><span class="check">✅</span> Ajuste manual de força por seleção</li>
       </ul>
       <button class="btn-gold full" id="buyBtnPrice" style="font-size:15px;border-radius:12px;padding:14px;">Comprar agora — R$10</button>
-      <p class="price-note">🔒 Pagamento via Pix — QR Code ou copia-e-cola · Confirmação na hora<br>Trocou de aparelho? Recupere o acesso com o e-mail da compra</p>
+      <p class="price-note">🔒 Pagamento via Pix — QR Code ou copia-e-cola · Confirmação na hora<br>Acesso durante a fase de grupos (até 27/06/2026) · 🔞 +18<br>Trocou de aparelho? Recupere o acesso com o e-mail da compra<br><a href="#" onclick="document.getElementById('termsScrim').classList.add('on');return false;" style="color:var(--dim);text-decoration:underline;">Termos de Uso e Política de Reembolso</a></p>
       <button class="recover-link" onclick="openRecover()">Já comprei — recuperar meu acesso</button>
     </div>
   </section>
@@ -382,8 +382,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
   <!-- Disclaimer -->
   <div class="disclaimer">
-    <h4>⚠️ AVISO IMPORTANTE — LEIA ANTES DE USAR</h4>
-    <p>Este painel é uma <strong>ferramenta de análise estatística</strong>, não um serviço de apostas e não garante nenhum resultado. As previsões são estimativas baseadas em dados históricos e modelos matemáticos — o placar mais provável acerta em torno de <strong>10 a 14% das vezes</strong>. Use como referência para tomar decisões mais informadas, não como certeza. <strong>Se for apostar, aposte apenas o que você pode perder com tranquilidade.</strong> Jogo responsável é obrigação de todos.</p>
+    <h4>⚠️ AVISO IMPORTANTE — LEIA ANTES DE USAR · 🔞 CONTEÚDO +18</h4>
+    <p>Este painel é uma <strong>ferramenta de análise estatística</strong>, não um serviço de apostas e não garante nenhum resultado. As previsões são estimativas baseadas em dados históricos e modelos matemáticos — o placar mais provável acerta em torno de <strong>10 a 14% das vezes</strong>. Use como referência para tomar decisões mais informadas, não como certeza. <strong>Se for apostar, aposte apenas o que você pode perder com tranquilidade.</strong> Jogo responsável é obrigação de todos. <strong>Apostas são proibidas para menores de 18 anos.</strong></p>
+    <p style="margin-top:10px;"><a href="#" onclick="document.getElementById('termsScrim').classList.add('on');return false;" style="color:var(--flood);text-decoration:underline;">📄 Termos de Uso e Política de Reembolso</a></p>
   </div>
 
 </div>
@@ -465,6 +466,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
     <div class="pix-status" id="recErr"></div>
     <button class="pix-close" onclick="document.getElementById('recScrim').classList.remove('on')">Fechar</button>
+  </div>
+</div>
+
+<!-- Terms of use modal -->
+<div class="scrim" id="termsScrim">
+  <div class="sheet">
+    <h3>📄 Termos de Uso — PalpitAI Copa 2026</h3>
+    <div class="sd" style="line-height:1.65;">
+      <b style="color:var(--text)">1. O produto.</b> O PalpitAI é uma ferramenta de <b style="color:var(--text)">análise estatística e simulação</b> dos jogos da fase de grupos da Copa do Mundo 2026. O pagamento único de R$ 10,00 dá acesso ao painel completo <b style="color:var(--text)">durante o período da fase de grupos, até 27/06/2026</b>. Não é serviço de apostas: não recebemos apostas nem pagamos prêmios.<br><br>
+      <b style="color:var(--text)">2. Sem garantia de resultados.</b> As previsões são estimativas probabilísticas (modelo de Poisson calibrado pelo ranking FIFA). O placar mais provável historicamente se confirma em cerca de 10–14% dos jogos. <b style="color:var(--text)">Nenhum resultado é garantido</b> e nada aqui constitui aconselhamento financeiro ou promessa de ganhos em apostas.<br><br>
+      <b style="color:var(--text)">3. Maioridade (+18).</b> O conteúdo é destinado a maiores de 18 anos. Apostas são proibidas para menores. Ao comprar, você declara ser maior de idade.<br><br>
+      <b style="color:var(--text)">4. Reembolso.</b> Você pode testar gratuitamente a demonstração antes de comprar. Após a compra, vale o direito de arrependimento de <b style="color:var(--text)">7 dias corridos</b> (art. 49 do CDC) — solicite pelo e-mail abaixo com o e-mail usado na compra. <b style="color:var(--text)">Após esse prazo legal, não há reembolso</b>, por se tratar de acesso a conteúdo digital por período determinado (fase de grupos da Copa 2026).<br><br>
+      <b style="color:var(--text)">5. Acesso.</b> O acesso é liberado neste navegador/dispositivo após a confirmação do pagamento e pode ser recuperado em outro dispositivo com o e-mail da compra. O acesso é pessoal e intransferível.<br><br>
+      <b style="color:var(--text)">6. Privacidade.</b> Coletamos apenas o e-mail informado no pagamento, usado exclusivamente para identificar a compra e recuperar o acesso. Não compartilhamos seus dados com terceiros.<br><br>
+      <b style="color:var(--text)">7. Jogo responsável.</b> Se decidir apostar, aposte apenas o que pode perder. Procure ajuda se o jogo deixar de ser diversão: <b style="color:var(--text)">jogadoresanonimos.com.br</b>.<br><br>
+      <b style="color:var(--text)">Contato:</b> ronaldocoelho18@gmail.com
+    </div>
+    <button class="btn flood full" onclick="document.getElementById('termsScrim').classList.remove('on')">Entendi</button>
   </div>
 </div>
 
