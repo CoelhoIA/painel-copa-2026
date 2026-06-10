@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Palpite do Dia — PalpitAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@700&family=Inter:wght@500;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:#0E1726;color:#E8EEF7;font-family:'Inter',sans-serif;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(50vw 40vh at 10% 0%, rgba(255,223,0,.12), transparent 60%),
+    radial-gradient(45vw 38vh at 92% 6%, rgba(0,156,59,.14), transparent 60%),
+    radial-gradient(40vw 40vh at 6% 100%, rgba(206,17,38,.08), transparent 60%),
+    radial-gradient(45vw 40vh at 96% 98%, rgba(60,59,110,.18), transparent 60%);}
+body::after{content:'';position:fixed;top:0;left:0;right:0;height:.8vh;
+  background:linear-gradient(90deg,#009C3B,#FFDF00 25%,#2BD96A 45%,#CE1126 65%,#fff 80%,#3C3B6E);}
+.card{position:relative;text-align:center;width:92vw;max-width:1100px;}
+.tag{display:inline-block;background:rgba(245,180,51,.14);border:1px solid rgba(245,180,51,.45);
+  color:#F5B433;border-radius:99px;padding:.9vh 2.4vw;font-size:2.3vh;font-weight:700;letter-spacing:.15em;margin-bottom:2.6vh;}
+.title{font-family:'Archivo Narrow';font-weight:700;font-size:5.6vh;line-height:1.05;margin-bottom:.8vh;}
+.title .ia{background:linear-gradient(95deg,#FFDF00,#2BD96A);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.sub{color:#9DB0CC;font-size:2.4vh;margin-bottom:4vh;}
+.match{display:flex;align-items:center;justify-content:center;gap:4vw;margin-bottom:3.6vh;}
+.team{display:flex;flex-direction:column;align-items:center;gap:1vh;width:24vw;}
+.team .fl{font-size:11vh;line-height:1;}
+.team .nm{font-family:'Archivo Narrow';font-weight:700;font-size:3.4vh;}
+.board{font-family:'Space Mono';font-weight:700;font-size:9vh;letter-spacing:.06em;
+  background:#0A111E;border:2px solid #2A3C5E;border-radius:2.4vh;padding:1.6vh 3.4vw;white-space:nowrap;
+  box-shadow:0 0 40px rgba(43,217,106,.18);}
+.probs{display:flex;justify-content:center;gap:2.2vw;margin-bottom:3.4vh;}
+.p{background:#16223A;border:1px solid #2A3C5E;border-radius:1.8vh;padding:1.6vh 2.2vw;min-width:17vw;}
+.p .v{font-family:'Space Mono';font-weight:700;font-size:3.8vh;}
+.p .k{color:#9DB0CC;font-size:1.9vh;text-transform:uppercase;letter-spacing:.08em;margin-top:.4vh;}
+.p.win .v{color:#2BD96A;}
+.scorer{color:#E8EEF7;font-size:2.6vh;margin-bottom:3.6vh;}
+.scorer b{color:#F5B433;}
+.foot{display:flex;align-items:center;justify-content:center;gap:1.6vw;color:#9DB0CC;font-size:2.2vh;}
+.foot .url{color:#FFDF00;font-weight:700;font-size:2.5vh;}
+.disc{position:fixed;bottom:1.6vh;left:0;right:0;text-align:center;color:#5d6f8d;font-size:1.6vh;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="tag">🤖 PALPITE DO DIA · IA + ESTATÍSTICA</div>
+  <div class="title">Abertura da <span class="ia">Copa 2026</span></div>
+  <div class="sub">Quinta, 11/06 · Grupo A · O que o modelo prevê:</div>
+  <div class="match">
+    <div class="team"><span class="fl">🇲🇽</span><span class="nm">México</span></div>
+    <div class="board">3 : 0</div>
+    <div class="team"><span class="fl">🇿🇦</span><span class="nm">África do Sul</span></div>
+  </div>
+  <div class="probs">
+    <div class="p win"><div class="v">89%</div><div class="k">México vence</div></div>
+    <div class="p"><div class="v">8%</div><div class="k">Empate</div></div>
+    <div class="p"><div class="v">78%</div><div class="k">+2.5 gols</div></div>
+  </div>
+  <div class="scorer">⚽ Goleador mais provável: <b>Santiago Giménez</b> — 68% de chance de marcar</div>
+  <div class="foot"><span>Demo grátis em</span><span class="url">painel-copa-2026.vercel.app</span></div>
+</div>
+<div class="disc">Estimativa estatística (modelo Poisson) — não é garantia de resultado. Aposte com responsabilidade, só o que pode perder.</div>
+</body>
+</html>
