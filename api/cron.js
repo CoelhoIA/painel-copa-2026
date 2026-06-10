@@ -46,6 +46,14 @@ function reminderHtml(f) {
 module.exports = async (req, res) => {
   if (req.query.key !== process.env.CRON_SECRET) return res.status(401).json({ error: 'unauthorized' });
 
+  // Modo de teste: ?test=email@x.com envia um resumo imediato só para esse e-mail
+  if (req.query.test) {
+    try {
+      await sendEmail(req.query.test, '⚽ [TESTE] Copa 2026 — resumo do PalpitAI', digestHtml());
+      return res.status(200).json({ ok: true, testSentTo: req.query.test });
+    } catch (e) { return res.status(500).json({ error: e.message }); }
+  }
+
   const report = { digestSent: 0, remindersSent: 0, errors: [] };
   try {
     const raw = await redis(['HGETALL', 'subs']);
