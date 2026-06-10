@@ -1,122 +1,362 @@
-<!-- Painel de Previsão — Copa do Mundo 2026 -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PalpitAI — Copa 2026 com Ciência</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@700&display=swap');
+:root{
+  --ink:#0E1726;--panel:#16223A;--panel2:#1E2E4D;--line:#2A3C5E;
+  --pitch:#2BD96A;--flood:#F5B433;--slate:#7C8BA6;--loss:#FF5A6E;
+  --text:#E8EEF7;--dim:#9DB0CC;--r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--ink);color:var(--text);font-family:'Inter',sans-serif;line-height:1.5;}
+a{color:inherit;text-decoration:none;}
 
-  :root{
-    --ink:#0E1726; --panel:#16223A; --panel2:#1E2E4D; --line:#2A3C5E;
-    --pitch:#2BD96A; --flood:#F5B433; --slate:#7C8BA6; --loss:#FF5A6E;
-    --text:#E8EEF7; --dim:#9DB0CC;
-    --r:14px;
-  }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  body{margin:0;background:var(--ink);color:var(--text);font-family:'Inter',sans-serif;line-height:1.45;}
-  #app{max-width:760px;margin:0 auto;padding:16px 14px 60px;}
+/* ===== LANDING ===== */
+#landing{max-width:720px;margin:0 auto;padding:0 16px 60px;}
 
-  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px;}
-  .ttl{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:26px;letter-spacing:.3px;line-height:1.05;}
-  .ttl .flood{color:var(--flood);}
-  .sub{color:var(--dim);font-size:12.5px;margin:2px 0 14px;}
-  .btn{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;
-       padding:8px 11px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
-  .btn:active{transform:scale(.97);}
-  .btn.flood{background:var(--flood);color:#1a1300;border-color:var(--flood);}
-  .toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+/* Hero */
+.hero{text-align:center;padding:48px 0 40px;}
+.hero-badge{display:inline-block;background:rgba(245,180,51,.15);border:1px solid rgba(245,180,51,.4);
+  color:var(--flood);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600;letter-spacing:.5px;margin-bottom:18px;}
+.hero h1{font-family:'Archivo Narrow',sans-serif;font-size:clamp(32px,7vw,52px);font-weight:700;
+  line-height:1.1;margin-bottom:16px;}
+.hero h1 .accent{color:var(--flood);}
+.hero-sub{color:var(--dim);font-size:15px;max-width:480px;margin:0 auto 28px;line-height:1.6;}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn-outline{background:transparent;border:2px solid var(--line);color:var(--text);border-radius:12px;
+  padding:12px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;}
+.btn-outline:hover{border-color:var(--dim);}
+.btn-gold{background:var(--flood);color:#1a1300;border:none;border-radius:12px;
+  padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;}
+.btn-gold:hover{filter:brightness(1.08);}
+.btn-gold:active,.btn-outline:active{transform:scale(.97);}
 
-  /* date chips */
-  .days{display:flex;gap:7px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none;}
-  .days::-webkit-scrollbar{display:none;}
-  .day{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);border-radius:11px;
-       padding:7px 11px;text-align:center;cursor:pointer;min-width:58px;}
-  .day .dow{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;}
-  .day .dnum{font-family:'Archivo Narrow';font-weight:700;font-size:17px;}
-  .day.active{background:var(--flood);border-color:var(--flood);}
-  .day.active .dow,.day.active .dnum{color:#1a1300;}
-  .day.done{border-color:var(--pitch);}
+/* Animated explainer */
+.explainer{margin:0 0 48px;}
+.explainer-label{text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--dim);margin-bottom:16px;font-weight:600;}
+.slideshow-wrap{position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:20px;overflow:hidden;height:240px;}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:28px 32px;text-align:center;
+  opacity:0;animation:fadeSlide 25s infinite;}
+.slide:nth-child(1){animation-delay:0s;}
+.slide:nth-child(2){animation-delay:5s;}
+.slide:nth-child(3){animation-delay:10s;}
+.slide:nth-child(4){animation-delay:15s;}
+.slide:nth-child(5){animation-delay:20s;}
+@keyframes fadeSlide{
+  0%{opacity:0;transform:translateY(12px);}
+  8%{opacity:1;transform:translateY(0);}
+  20%{opacity:1;transform:translateY(0);}
+  28%{opacity:0;transform:translateY(-12px);}
+  100%{opacity:0;}
+}
+.slide-icon{font-size:38px;margin-bottom:12px;line-height:1;}
+.slide h3{font-family:'Archivo Narrow';font-weight:700;font-size:20px;margin-bottom:8px;color:var(--flood);}
+.slide p{color:var(--dim);font-size:13.5px;line-height:1.6;max-width:380px;}
+.slide p strong{color:var(--text);}
+.slide-dots{display:flex;justify-content:center;gap:6px;margin-top:12px;}
+.slide-dots span{width:6px;height:6px;border-radius:50%;background:var(--line);}
+.slide-dots span.active{background:var(--flood);}
 
-  /* match card */
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px;}
-  .ctop{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);margin-bottom:10px;}
-  .grp{background:var(--panel2);border-radius:6px;padding:2px 7px;font-weight:600;letter-spacing:.4px;}
-  .score-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;}
-  .team{display:flex;flex-direction:column;align-items:center;gap:4px;}
-  .team .fl{font-size:30px;line-height:1;}
-  .team .nm{font-family:'Archivo Narrow';font-weight:700;font-size:15px;text-align:center;}
-  .board{font-family:'Space Mono';font-weight:700;font-size:34px;letter-spacing:1px;
-         background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 14px;white-space:nowrap;}
-  .actual{color:var(--pitch);font-size:11px;text-align:center;margin-top:6px;font-weight:600;}
+/* Section titles */
+.sec-title{font-family:'Archivo Narrow';font-weight:700;font-size:24px;margin-bottom:6px;}
+.sec-sub{color:var(--dim);font-size:13.5px;margin-bottom:24px;}
 
-  /* confidence bar */
-  .conf{margin:13px 0 4px;}
-  .conf .bar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--ink);}
-  .conf .w{background:var(--pitch);} .conf .d{background:var(--slate);} .conf .l{background:var(--loss);}
-  .conf .lbls{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-top:5px;}
-  .conf .lbls b{color:var(--text);font-weight:600;}
+/* Demo section */
+.demo-section{margin-bottom:48px;}
+.demo-tag{display:inline-block;background:rgba(43,217,106,.15);border:1px solid rgba(43,217,106,.3);
+  color:var(--pitch);border-radius:6px;padding:2px 9px;font-size:11px;font-weight:700;
+  letter-spacing:.4px;margin-bottom:16px;}
 
-  .stats{display:flex;gap:6px;margin-top:11px;}
-  .stat{flex:1;background:var(--ink);border-radius:9px;padding:7px 4px;text-align:center;}
-  .stat .v{font-family:'Space Mono';font-weight:700;font-size:14px;}
-  .stat .k{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.3px;margin-top:1px;}
+/* Variables grid */
+.vars-section{margin-bottom:48px;}
+.vars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.var-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;}
+.var-icon{font-size:24px;margin-bottom:8px;}
+.var-title{font-weight:700;font-size:13.5px;margin-bottom:4px;}
+.var-desc{color:var(--dim);font-size:12px;line-height:1.5;}
 
-  .seg{margin-top:12px;}
-  .seg h4{font-size:10.5px;color:var(--flood);text-transform:uppercase;letter-spacing:.7px;margin:0 0 6px;font-weight:700;}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;}
-  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 9px;font-size:12px;}
-  .chip b{font-family:'Space Mono';}
-  .chip .pc{color:var(--dim);font-size:10.5px;margin-left:3px;}
+/* Pricing */
+.pricing-section{margin-bottom:48px;display:flex;justify-content:center;}
+.price-card{background:var(--panel);border:2px solid var(--flood);border-radius:20px;
+  padding:32px 28px;max-width:360px;width:100%;text-align:center;}
+.price-badge{background:rgba(245,180,51,.15);color:var(--flood);border-radius:99px;
+  padding:4px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;display:inline-block;margin-bottom:16px;}
+.price-amount{font-family:'Archivo Narrow';font-size:56px;font-weight:700;line-height:1;margin-bottom:4px;}
+.price-amount sup{font-size:22px;vertical-align:top;margin-top:10px;display:inline-block;}
+.price-once{color:var(--dim);font-size:12.5px;margin-bottom:22px;}
+.price-list{list-style:none;text-align:left;margin-bottom:24px;display:flex;flex-direction:column;gap:10px;}
+.price-list li{font-size:13.5px;display:flex;align-items:center;gap:8px;}
+.price-list li .check{color:var(--pitch);font-size:16px;}
+.price-note{color:var(--slate);font-size:11px;margin-top:10px;line-height:1.5;}
 
-  .scorers{display:flex;flex-direction:column;gap:5px;}
-  .sc{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;}
-  .sc .who{color:var(--text);} .sc .who span{color:var(--dim);font-size:11px;}
-  .sc .pb{flex:0 0 96px;height:6px;background:var(--ink);border-radius:4px;margin-left:10px;overflow:hidden;}
-  .sc .pf{height:100%;background:var(--flood);}
-  .sc .pct{flex:0 0 38px;text-align:right;font-family:'Space Mono';font-weight:700;font-size:12px;}
+/* Developer credit */
+.dev-section{text-align:center;padding:16px;margin-bottom:32px;}
+.dev-section p{color:var(--dim);font-size:12.5px;line-height:1.8;}
+.dev-section strong{color:var(--text);}
 
-  .actions{display:flex;gap:8px;margin-top:13px;}
-  .actions .btn{flex:1;text-align:center;}
+/* Disclaimer */
+.disclaimer{background:rgba(255,90,110,.07);border:1px solid rgba(255,90,110,.25);
+  border-radius:var(--r);padding:18px 20px;margin-bottom:24px;}
+.disclaimer h4{color:var(--loss);font-size:13px;font-weight:700;margin-bottom:8px;letter-spacing:.3px;}
+.disclaimer p{color:var(--dim);font-size:12.5px;line-height:1.65;}
+.disclaimer p strong{color:var(--text);}
 
-  .empty{color:var(--dim);text-align:center;padding:30px 10px;font-size:13px;}
-  .note{font-size:11px;color:var(--slate);margin-top:18px;text-align:center;line-height:1.5;}
+/* ===== PANEL (paid) ===== */
+#panel{max-width:760px;margin:0 auto;padding:16px 14px 60px;}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px;}
+.ttl{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:26px;letter-spacing:.3px;line-height:1.05;}
+.ttl .flood{color:var(--flood);}
+.sub{color:var(--dim);font-size:12.5px;margin:2px 0 14px;}
+.btn{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;
+  padding:8px 11px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.btn:active{transform:scale(.97);}
+.btn.flood{background:var(--flood);color:#1a1300;border-color:var(--flood);}
+.toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
 
-  /* modal */
-  .scrim{position:fixed;inset:0;background:rgba(6,11,20,.72);display:none;align-items:flex-end;justify-content:center;z-index:50;}
-  .scrim.on{display:flex;}
-  .sheet{background:var(--panel);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:760px;
-         max-height:82vh;overflow-y:auto;padding:18px 16px 26px;}
-  .sheet h3{font-family:'Archivo Narrow';font-weight:700;font-size:20px;margin:0 0 3px;}
-  .sheet .sd{color:var(--dim);font-size:12px;margin-bottom:16px;}
-  .ratectl{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-  .ratectl .fl{font-size:24px;}
-  .ratectl .nm{flex:1;font-weight:600;font-size:14px;}
-  .ratectl .stp{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);
-                color:var(--text);font-size:18px;font-weight:700;cursor:pointer;}
-  .ratectl .val{width:58px;text-align:center;font-family:'Space Mono';font-weight:700;font-size:15px;
-                background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 0;}
-  .rsearch{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:10px;color:var(--text);
-           padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:14px;}
-  .resin{display:flex;gap:10px;align-items:center;justify-content:center;margin:14px 0;}
-  .resin input{width:62px;text-align:center;font-family:'Space Mono';font-weight:700;font-size:24px;
-               background:var(--ink);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:8px 0;}
-  .resin .x{font-family:'Archivo Narrow';font-size:18px;color:var(--dim);}
-  .full{width:100%;text-align:center;margin-top:6px;padding:12px;}
+.days{display:flex;gap:7px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none;}
+.days::-webkit-scrollbar{display:none;}
+.day{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:7px 11px;text-align:center;cursor:pointer;min-width:58px;}
+.day .dow{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;}
+.day .dnum{font-family:'Archivo Narrow';font-weight:700;font-size:17px;}
+.day.active{background:var(--flood);border-color:var(--flood);}
+.day.active .dow,.day.active .dnum{color:#1a1300;}
+.day.done{border-color:var(--pitch);}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.ctop{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);margin-bottom:10px;}
+.grp{background:var(--panel2);border-radius:6px;padding:2px 7px;font-weight:600;letter-spacing:.4px;}
+.score-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;}
+.team{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.team .fl{font-size:30px;line-height:1;}
+.team .nm{font-family:'Archivo Narrow';font-weight:700;font-size:15px;text-align:center;}
+.board{font-family:'Space Mono';font-weight:700;font-size:34px;letter-spacing:1px;
+  background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 14px;white-space:nowrap;}
+.actual{color:var(--pitch);font-size:11px;text-align:center;margin-top:6px;font-weight:600;}
+
+.conf{margin:13px 0 4px;}
+.conf .bar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--ink);}
+.conf .w{background:var(--pitch);}
+.conf .d{background:var(--slate);}
+.conf .l{background:var(--loss);}
+.conf .lbls{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-top:5px;}
+.conf .lbls b{color:var(--text);font-weight:600;}
+
+.stats{display:flex;gap:6px;margin-top:11px;}
+.stat{flex:1;background:var(--ink);border-radius:9px;padding:7px 4px;text-align:center;}
+.stat .v{font-family:'Space Mono';font-weight:700;font-size:14px;}
+.stat .k{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.3px;margin-top:1px;}
+
+.seg{margin-top:12px;}
+.seg h4{font-size:10.5px;color:var(--flood);text-transform:uppercase;letter-spacing:.7px;margin:0 0 6px;font-weight:700;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 9px;font-size:12px;}
+.chip b{font-family:'Space Mono';}
+.chip .pc{color:var(--dim);font-size:10.5px;margin-left:3px;}
+
+.scorers{display:flex;flex-direction:column;gap:5px;}
+.sc{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;}
+.sc .who{color:var(--text);}
+.sc .who span{color:var(--dim);font-size:11px;}
+.sc .pb{flex:0 0 96px;height:6px;background:var(--ink);border-radius:4px;margin-left:10px;overflow:hidden;}
+.sc .pf{height:100%;background:var(--flood);}
+.sc .pct{flex:0 0 38px;text-align:right;font-family:'Space Mono';font-weight:700;font-size:12px;}
+
+.actions{display:flex;gap:8px;margin-top:13px;}
+.actions .btn{flex:1;text-align:center;}
+.empty{color:var(--dim);text-align:center;padding:30px 10px;font-size:13px;}
+.note{font-size:11px;color:var(--slate);margin-top:18px;text-align:center;line-height:1.5;}
+
+.scrim{position:fixed;inset:0;background:rgba(6,11,20,.72);display:none;align-items:flex-end;justify-content:center;z-index:50;}
+.scrim.on{display:flex;}
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:760px;
+  max-height:82vh;overflow-y:auto;padding:18px 16px 26px;}
+.sheet h3{font-family:'Archivo Narrow';font-weight:700;font-size:20px;margin:0 0 3px;}
+.sheet .sd{color:var(--dim);font-size:12px;margin-bottom:16px;}
+.ratectl{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.ratectl .fl{font-size:24px;}
+.ratectl .nm{flex:1;font-weight:600;font-size:14px;}
+.ratectl .stp{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);
+  color:var(--text);font-size:18px;font-weight:700;cursor:pointer;}
+.ratectl .val{width:58px;text-align:center;font-family:'Space Mono';font-weight:700;font-size:15px;
+  background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 0;}
+.rsearch{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:10px;color:var(--text);
+  padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:14px;}
+.resin{display:flex;gap:10px;align-items:center;justify-content:center;margin:14px 0;}
+.resin input{width:62px;text-align:center;font-family:'Space Mono';font-weight:700;font-size:24px;
+  background:var(--ink);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:8px 0;}
+.resin .x{font-family:'Archivo Narrow';font-size:18px;color:var(--dim);}
+.full{width:100%;text-align:center;margin-top:6px;padding:12px;}
+
+/* loading spinner */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(26,19,0,.3);
+  border-top-color:#1a1300;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
+</head>
+<body>
 
+<!-- ==================== LANDING ==================== -->
+<div id="landing">
+<div style="max-width:720px;margin:0 auto;padding:0 16px 60px;">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">⚽ Copa do Mundo 2026 · 48 seleções · 72 jogos</div>
+    <h1>Palpites com <span class="accent">Ciência</span>,<br>não com sorte</h1>
+    <p class="hero-sub">Modelo estatístico que analisa cada jogo da fase de grupos e indica o placar mais provável, goleadores e chances de cada seleção — antes do apito inicial.</p>
+    <div class="hero-btns">
+      <button class="btn-outline" onclick="document.getElementById('demo-section').scrollIntoView({behavior:'smooth'})">Ver demonstração grátis ↓</button>
+      <button class="btn-gold" id="buyBtnHero">Acesso completo — R$10 →</button>
+    </div>
+  </section>
+
+  <!-- Animated explainer -->
+  <section style="margin-bottom:48px;">
+    <div class="explainer-label">Como funciona — deslize para ver</div>
+    <div class="slideshow-wrap">
+      <div class="slide">
+        <div class="slide-icon">📊⚽</div>
+        <h3>O que é o PalpitAI?</h3>
+        <p>Um painel que usa <strong>matemática real</strong> para prever o que vai acontecer nos jogos da Copa 2026 — antes do apito inicial.</p>
+      </div>
+      <div class="slide">
+        <div class="slide-icon">🧮</div>
+        <h3>Modelo de Poisson</h3>
+        <p>A mesma fórmula usada por analistas esportivos profissionais. Calcula <strong>a probabilidade de cada placar possível</strong> com base na força de cada seleção.</p>
+      </div>
+      <div class="slide">
+        <div class="slide-icon">🏟️</div>
+        <h3>5 variáveis consideradas</h3>
+        <p>Ranking FIFA · <strong>Vantagem em casa</strong> (México, EUA, Canadá) · Resultados recentes · Diferença de gols esperados · Correção Dixon-Coles</p>
+      </div>
+      <div class="slide">
+        <div class="slide-icon">🎯</div>
+        <h3>O que você recebe</h3>
+        <p><strong>Placar mais provável</strong> · % de vitória/empate/derrota · Goleadores prováveis · Top 4 placares · Ambas marcam · Over 2.5 gols</p>
+      </div>
+      <div class="slide">
+        <div class="slide-icon">⚠️</div>
+        <h3>Honestidade acima de tudo</h3>
+        <p>Isso <strong>não é garantia</strong>. O placar mais provável acerta ~12% das vezes. É uma <strong>estimativa científica</strong> — use com responsabilidade e só aposte o que pode perder.</p>
+      </div>
+    </div>
+    <!-- dot indicators (purely visual) -->
+    <div class="slide-dots" style="margin-top:10px;">
+      <span class="active"></span><span></span><span></span><span></span><span></span>
+    </div>
+  </section>
+
+  <!-- Demo grátis -->
+  <section id="demo-section" style="margin-bottom:48px;">
+    <div class="demo-tag">GRÁTIS</div>
+    <div class="sec-title">Experimente sem pagar nada</div>
+    <div class="sec-sub">Veja a previsão completa de 1 jogo de hoje (ou do próximo dia com partidas)</div>
+    <div id="demoCard"></div>
+    <div style="text-align:center;margin-top:20px;">
+      <p style="color:var(--dim);font-size:13px;margin-bottom:14px;">Quer ver todos os jogos? São 72 partidas com análise completa.</p>
+      <button class="btn-gold" id="buyBtnDemo" style="font-size:15px;padding:14px 32px;">Comprar acesso completo — R$10 →</button>
+    </div>
+  </section>
+
+  <!-- Variáveis -->
+  <section style="margin-bottom:48px;">
+    <div class="sec-title">O que o modelo analisa</div>
+    <div class="sec-sub">5 variáveis combinadas para gerar cada previsão</div>
+    <div class="vars-grid">
+      <div class="var-card">
+        <div class="var-icon">🏅</div>
+        <div class="var-title">Força base (Ranking FIFA)</div>
+        <div class="var-desc">Pontuação real do ranking FIFA de abril/2026, ajustada pelos amistosos de junho. É o ponto de partida de cada seleção.</div>
+      </div>
+      <div class="var-card">
+        <div class="var-icon">🏟️</div>
+        <div class="var-title">Vantagem em casa</div>
+        <div class="var-desc">México, EUA e Canadá ganham +20% nos gols esperados por jogar em casa. Cientificamente comprovado em Copas do Mundo.</div>
+      </div>
+      <div class="var-card">
+        <div class="var-icon">📈</div>
+        <div class="var-title">Forma recente (Elo)</div>
+        <div class="var-desc">Cada resultado da Copa atualiza a força das seleções via sistema Elo, ponderando a diferença de gols. Quem vence de 3×0 sobe mais do que quem vence de 1×0.</div>
+      </div>
+      <div class="var-card">
+        <div class="var-icon">🎲</div>
+        <div class="var-title">Distribuição de Poisson</div>
+        <div class="var-desc">Calcula a probabilidade de cada combinação de placares (0×0, 1×0, 2×1...) a partir dos gols esperados de cada time.</div>
+      </div>
+      <div class="var-card">
+        <div class="var-icon">🔧</div>
+        <div class="var-title">Correção Dixon-Coles</div>
+        <div class="var-desc">Ajuste matemático que corrige a tendência do Poisson de subestimar placares baixos (0×0, 1×0, 0×1, 1×1), muito comuns no futebol.</div>
+      </div>
+      <div class="var-card">
+        <div class="var-icon">⚽</div>
+        <div class="var-title">Peso ofensivo dos jogadores</div>
+        <div class="var-desc">Cada goleador tem um peso no ataque da sua seleção. O modelo estima a chance individual de marcar com base nos gols esperados do time.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section style="margin-bottom:48px;display:flex;justify-content:center;">
+    <div class="price-card">
+      <div class="price-badge">PAGAMENTO ÚNICO · SEM ASSINATURA</div>
+      <div class="price-amount"><sup>R$</sup>10</div>
+      <div class="price-once">acesso para sempre neste dispositivo</div>
+      <ul class="price-list">
+        <li><span class="check">✅</span> 72 jogos da fase de grupos completos</li>
+        <li><span class="check">✅</span> Placar mais provável em cada jogo</li>
+        <li><span class="check">✅</span> % vitória · empate · derrota</li>
+        <li><span class="check">✅</span> Goleadores prováveis por jogo</li>
+        <li><span class="check">✅</span> Over 2.5 gols · Ambas marcam</li>
+        <li><span class="check">✅</span> Atualiza ao lançar resultados reais</li>
+        <li><span class="check">✅</span> Ajuste manual de força por seleção</li>
+      </ul>
+      <button class="btn-gold full" id="buyBtnPrice" style="font-size:15px;border-radius:12px;padding:14px;">Comprar agora — R$10</button>
+      <p class="price-note">🔒 Pagamento seguro via Stripe · Cartão de crédito ou débito<br>Acesso salvo neste dispositivo/navegador</p>
+    </div>
+  </section>
+
+  <!-- Developer credit -->
+  <div class="dev-section">
+    <p>Desenvolvido por <strong>RonaldoAeroespecial</strong><br>
+    Modelo de Inteligência Artificial: <strong>Claude Pro</strong> (Anthropic)<br>
+    <span style="font-size:11px;">Lógica estatística, dados e interface construídos com auxílio de IA generativa</span></p>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <h4>⚠️ AVISO IMPORTANTE — LEIA ANTES DE USAR</h4>
+    <p>Este painel é uma <strong>ferramenta de análise estatística</strong>, não um serviço de apostas e não garante nenhum resultado. As previsões são estimativas baseadas em dados históricos e modelos matemáticos — o placar mais provável acerta em torno de <strong>10 a 14% das vezes</strong>. Use como referência para tomar decisões mais informadas, não como certeza. <strong>Se for apostar, aposte apenas o que você pode perder com tranquilidade.</strong> Jogo responsável é obrigação de todos.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ==================== PANEL (paid) ==================== -->
+<div id="panel" style="display:none;">
 <div id="app">
-  <div class="head">
+  <div class="panel-head">
     <div>
       <div class="ttl">Painel <span class="flood">Copa 2026</span></div>
     </div>
     <button class="btn" id="resetBtn">Restaurar</button>
   </div>
   <div class="sub" id="subtitle">Modelo Poisson · força ajustável · recalibra a cada resultado lançado</div>
-
   <div class="toolbar">
     <button class="btn flood" id="editBtn">Ajustar seleções</button>
     <button class="btn" id="howBtn">Como funciona</button>
   </div>
-
   <div class="days" id="days"></div>
   <div id="matches"></div>
-
   <div class="note">
     Goleadores e placares são estimativas probabilísticas, não previsões garantidas — o placar mais provável costuma sair em ~10–14% dos jogos.
     Use como referência. Aposte só o que pode perder.
@@ -137,7 +377,7 @@
 <div class="scrim" id="resScrim">
   <div class="sheet">
     <h3 id="resTitle">Lançar resultado</h3>
-    <div class="sd">Digite o placar final do jogo. O modelo ajusta a força das duas seleções com base no desempenho (resultado + diferença de gols) e recalibra os próximos jogos.</div>
+    <div class="sd">Digite o placar final do jogo. O modelo ajusta a força das duas seleções com base no desempenho e recalibra os próximos jogos.</div>
     <div class="resin">
       <div style="text-align:center"><div id="resHomeFl" style="font-size:26px"></div><div id="resHomeNm" style="font-size:12px;color:var(--dim)"></div></div>
       <input id="resHome" type="number" min="0" inputmode="numeric">
@@ -158,15 +398,16 @@
       <b style="color:var(--text)">O motor</b> é um modelo Poisson com correção Dixon-Coles. Cada seleção tem uma nota de força (base: ranking FIFA de abr/2026 já ajustado pelos amistosos de junho). A diferença de força vira gols esperados (xG), e a distribuição de Poisson dá a chance de cada placar.<br><br>
       <b style="color:var(--text)">A barra colorida</b> mostra a probabilidade de vitória do mandante (verde) / empate (cinza) / vitória do visitante (vermelho).<br><br>
       <b style="color:var(--text)">Ajustar seleções:</b> mude a nota de força à mão quando souber de lesão, escalação ou forma. Tudo recalcula na hora.<br><br>
-      <b style="color:var(--text)">Lançar resultado:</b> depois de cada jogo, registre o placar real. O modelo nudge a força das duas seleções (estilo Elo, considerando a diferença de gols) — é assim que o "desempenho no jogo anterior" entra no cálculo dos próximos.<br><br>
-      <b style="color:var(--text)">Goleadores:</b> chance de marcar a qualquer momento, estimada a partir do xG do time e do peso ofensivo de cada jogador. É aproximação, não cravada.
+      <b style="color:var(--text)">Lançar resultado:</b> depois de cada jogo, registre o placar real. O modelo ajusta a força das duas seleções (estilo Elo, considerando diferença de gols) — é assim que a forma entra no cálculo dos próximos jogos.<br><br>
+      <b style="color:var(--text)">Goleadores:</b> chance de marcar estimada a partir do xG do time e do peso ofensivo de cada jogador. É aproximação, não cravada.
     </div>
     <button class="btn flood full" id="howClose">Entendi</button>
   </div>
 </div>
+</div>
 
 <script>
-//==================== DADOS ====================
+// ==================== DADOS ====================
 const HOSTS = new Set(["México","EUA","Canadá"]);
 const BASE = {
  "México":1691,"África do Sul":1430,"Coreia do Sul":1575,"Tchéquia":1490,
@@ -242,12 +483,11 @@ const SCORERS = {
  "Gana":[["Iñaki Williams",.30],["Mohammed Kudus",.26],["Jordan Ayew",.18]],
  "Panamá":[["José Fajardo",.30],["Ismael Díaz",.24]]
 };
-// id, data ISO, rótulo dia, dow, grupo, mandante, visitante
 const FIX = [
  ["m01","2026-06-11","11","QUI","A","México","África do Sul"],["m02","2026-06-11","11","QUI","A","Coreia do Sul","Tchéquia"],
  ["m03","2026-06-12","12","SEX","B","Canadá","Bósnia"],["m04","2026-06-12","12","SEX","D","EUA","Paraguai"],
  ["m05","2026-06-13","13","SÁB","B","Catar","Suíça"],["m06","2026-06-13","13","SÁB","C","Brasil","Marrocos"],["m07","2026-06-13","13","SÁB","C","Haiti","Escócia"],["m08","2026-06-13","13","SÁB","D","Austrália","Turquia"],
- ["m09","2026-06-14","14","DOM","E","Alemanha","Curaçao"],["m10","2026-06-14","14","DOM","F","Holanda","Japão"],["m11","2026-06-14","14","DOM","E","Costa do Marfim","Equador"],["m12","2026-06-14","14","DOM","F","Suécia","Tunísia"],
+ ["m09","2026-06-14","14","DOM","E","Alemanha","Curaçao"],["m10","2026-06-14","14","DOM","F","Holanda","Japão"],["m11","2026-06-14","14","DOM","E","Costa do Marfim","Equador"],["m12","2026-06-14","14","DOM","F","Suédia","Tunísia"],
  ["m13","2026-06-15","15","SEG","H","Espanha","Cabo Verde"],["m14","2026-06-15","15","SEG","G","Bélgica","Egito"],["m15","2026-06-15","15","SEG","H","Arábia Saudita","Uruguai"],["m16","2026-06-15","15","SEG","G","Irã","Nova Zelândia"],
  ["m17","2026-06-16","16","TER","I","França","Senegal"],["m18","2026-06-16","16","TER","I","Iraque","Noruega"],["m19","2026-06-16","16","TER","J","Argentina","Argélia"],["m20","2026-06-16","16","TER","J","Áustria","Jordânia"],
  ["m21","2026-06-17","17","QUA","K","Portugal","RD Congo"],["m22","2026-06-17","17","QUA","L","Inglaterra","Croácia"],["m23","2026-06-17","17","QUA","L","Gana","Panamá"],["m24","2026-06-17","17","QUA","K","Uzbequistão","Colômbia"],
@@ -264,7 +504,7 @@ const FIX = [
 ];
 const DATES = [...new Set(FIX.map(f=>f[1]))];
 
-//==================== MODELO ====================
+// ==================== MODELO ====================
 const LEAGUE=1.35, HOME=0.20, SCALE=0.0030, RHO=-0.05, MAXG=7;
 const _f=[1,1,2,6,24,120,720,5040,40320];
 const pois=(k,l)=>Math.exp(-l)*Math.pow(l,k)/_f[k];
@@ -277,17 +517,17 @@ function tau(x,y,lx,ly){
 }
 function xg(t,o){
   let lam=LEAGUE*Math.exp(SCALE*(R[t]-R[o]));
-  if(HOSTS.has(t)) lam*=(1+HOME);
+  if(HOSTS.has(t))lam*=(1+HOME);
   return Math.max(0.15,lam);
 }
 function predict(t,o){
-  const lt=xg(t,o), lo=xg(o,t);
-  let M=[], sum=0;
+  const lt=xg(t,o),lo=xg(o,t);
+  let M=[],sum=0;
   for(let x=0;x<=MAXG;x++){M[x]=[];for(let y=0;y<=MAXG;y++){const p=pois(x,lt)*pois(y,lo)*tau(x,y,lt,lo);M[x][y]=p;sum+=p;}}
   let pw=0,pd=0,pl=0,o25=0,btts=0,best=[0,0],bp=0,flat=[];
   for(let x=0;x<=MAXG;x++)for(let y=0;y<=MAXG;y++){
     const p=M[x][y]/sum;
-    if(x>y)pw+=p; else if(x===y)pd+=p; else pl+=p;
+    if(x>y)pw+=p;else if(x===y)pd+=p;else pl+=p;
     if(x+y>=3)o25+=p;
     if(x>=1&&y>=1)btts+=p;
     if(p>bp){bp=p;best=[x,y];}
@@ -301,55 +541,169 @@ function scorers(team,teamXG){
   return list.map(([n,s])=>[n,1-Math.exp(-s*teamXG)]).sort((a,b)=>b[1]-a[1]).slice(0,3);
 }
 
-//==================== ESTADO + PERSISTÊNCIA ====================
-let R={...BASE};
-let RESULTS={};
+// ==================== ESTADO ====================
+let R={...BASE}, RESULTS={};
 const mem={};
 const store={
-  async get(k){
-    try{if(window.storage){const r=await window.storage.get(k);return r?r.value:null;}}catch(e){}
-    try{const v=localStorage.getItem(k);if(v!==null)return v;}catch(e){}
-    return mem[k]??null;
-  },
-  async set(k,v){
-    try{if(window.storage){await window.storage.set(k,v,false);return;}}catch(e){}
-    try{localStorage.setItem(k,v);return;}catch(e){}
-    mem[k]=v;
-  }
+  async get(k){try{const v=localStorage.getItem(k);if(v!==null)return v;}catch(e){}return mem[k]??null;},
+  async set(k,v){try{localStorage.setItem(k,v);return;}catch(e){}mem[k]=v;}
 };
 async function loadState(){
-  try{const r=await store.get('wc26_ratings'); if(r){const o=JSON.parse(r); R={...BASE,...o};}}catch(e){}
-  try{const r=await store.get('wc26_results'); if(r){RESULTS=JSON.parse(r);}}catch(e){}
+  try{const r=await store.get('wc26_ratings');if(r){const o=JSON.parse(r);R={...BASE,...o};}}catch(e){}
+  try{const r=await store.get('wc26_results');if(r){RESULTS=JSON.parse(r);}}catch(e){}
 }
 async function saveRatings(){await store.set('wc26_ratings',JSON.stringify(R));}
 async function saveResults(){await store.set('wc26_results',JSON.stringify(RESULTS));}
-
-// Elo nudge a partir de resultado real
 function applyElo(h,a,hs,as){
   const C=400,K=34;
-  const eh=1/(1+Math.pow(10,-(R[h]-R[a])/C)), ea=1-eh;
-  let sh,sa; if(hs>as){sh=1;sa=0;}else if(hs<as){sh=0;sa=1;}else{sh=.5;sa=.5;}
-  const gd=Math.abs(hs-as);
-  const G=gd<=1?1:gd===2?1.5:(11+gd)/8;
-  R[h]+=K*G*(sh-eh); R[a]+=K*G*(sa-ea);
+  const eh=1/(1+Math.pow(10,-(R[h]-R[a])/C)),ea=1-eh;
+  let sh,sa;if(hs>as){sh=1;sa=0;}else if(hs<as){sh=0;sa=1;}else{sh=.5;sa=.5;}
+  const gd=Math.abs(hs-as),G=gd<=1?1:gd===2?1.5:(11+gd)/8;
+  R[h]+=K*G*(sh-eh);R[a]+=K*G*(sa-ea);
 }
 
-//==================== UI ====================
+// ==================== ACCESS CONTROL ====================
+const TOKEN_KEY='wc26_access_token';
+
+async function boot(){
+  await loadState();
+
+  // Check URL for Mercado Pago redirect
+  const params=new URLSearchParams(window.location.search);
+  const paymentId=params.get('payment_id');
+  const status=params.get('status') || params.get('collection_status');
+  if(paymentId && status==='approved'){
+    try{
+      const res=await fetch('/api/verify-payment?payment_id='+paymentId);
+      const data=await res.json();
+      if(data.valid){
+        localStorage.setItem(TOKEN_KEY,paymentId);
+        window.history.replaceState({},'','/');
+        showPanel();return;
+      }
+    }catch(e){}
+  }
+
+  // Check existing token
+  const token=localStorage.getItem(TOKEN_KEY);
+  if(token){showPanel();return;}
+
+  // Show landing
+  renderDemo();
+}
+
+function showPanel(){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('panel').style.display='block';
+  initPanel();
+}
+
+async function handleBuy(btn){
+  const orig=btn.innerHTML;
+  btn.innerHTML='<span class="spinner"></span>Aguarde...';
+  btn.disabled=true;
+  try{
+    const res=await fetch('/api/create-checkout',{method:'POST'});
+    const data=await res.json();
+    if(data.url){window.location.href=data.url;return;}
+    throw new Error(data.error||'Erro');
+  }catch(e){
+    btn.innerHTML=orig;
+    btn.disabled=false;
+    alert('Erro ao iniciar pagamento. Tente novamente em instantes.');
+  }
+}
+
+// Buy buttons
+document.getElementById('buyBtnHero').onclick=function(){handleBuy(this);};
+document.getElementById('buyBtnDemo').onclick=function(){handleBuy(this);};
+document.getElementById('buyBtnPrice').onclick=function(){handleBuy(this);};
+
+// ==================== DEMO (1 jogo grátis) ====================
+function renderDemo(){
+  const today=new Date().toISOString().slice(0,10);
+  // Find nearest date >= today
+  let demoDate=DATES.find(d=>d>=today)||DATES[DATES.length-1];
+  const games=FIX.filter(f=>f[1]===demoDate);
+  if(!games.length)return;
+  // Pick random game from that day
+  const f=games[Math.floor(Math.random()*games.length)];
+  const [id,,,,grp,h,a]=f;
+  const P=predict(h,a);
+  const scH=scorers(h,P.lt),scA=scorers(a,P.lo);
+  const allSc=[...scH.map(s=>[h,...s]),...scA.map(s=>[a,...s])].sort((x,y)=>y[2]-x[2]).slice(0,3);
+  const pct=x=>Math.round(x*100);
+  const dow={
+    "2026-06-11":"Qui","2026-06-12":"Sex","2026-06-13":"Sáb","2026-06-14":"Dom",
+    "2026-06-15":"Seg","2026-06-16":"Ter","2026-06-17":"Qua","2026-06-18":"Qui",
+    "2026-06-19":"Sex","2026-06-20":"Sáb","2026-06-21":"Dom","2026-06-22":"Seg",
+    "2026-06-23":"Ter","2026-06-24":"Qua","2026-06-25":"Qui","2026-06-26":"Sex","2026-06-27":"Sáb"
+  }[demoDate]||'';
+
+  document.getElementById('demoCard').innerHTML=`
+    <div style="font-size:12px;color:var(--dim);margin-bottom:10px;">${dow}, ${demoDate.slice(8)}/${demoDate.slice(5,7)} — jogo sorteado aleatoriamente</div>
+    <div class="card">
+      <div class="ctop"><span class="grp">GRUPO ${grp}</span><span>previsão do modelo</span></div>
+      <div class="score-row">
+        <div class="team"><span class="fl">${FLAG[h]}</span><span class="nm">${h}</span></div>
+        <div class="board">${P.best[0]} : ${P.best[1]}</div>
+        <div class="team"><span class="fl">${FLAG[a]}</span><span class="nm">${a}</span></div>
+      </div>
+      <div class="conf">
+        <div class="bar">
+          <span class="w" style="width:${pct(P.pw)}%"></span>
+          <span class="d" style="width:${pct(P.pd)}%"></span>
+          <span class="l" style="width:${pct(P.pl)}%"></span>
+        </div>
+        <div class="lbls">
+          <span><b>${pct(P.pw)}%</b> ${h}</span>
+          <span><b>${pct(P.pd)}%</b> empate</span>
+          <span><b>${pct(P.pl)}%</b> ${a}</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="v">${P.lt.toFixed(1)}–${P.lo.toFixed(1)}</div><div class="k">gols esperados</div></div>
+        <div class="stat"><div class="v">${pct(P.o25)}%</div><div class="k">+2.5 gols</div></div>
+        <div class="stat"><div class="v">${pct(P.btts)}%</div><div class="k">ambas marcam</div></div>
+        <div class="stat"><div class="v">${pct(P.bp)}%</div><div class="k">chance do placar</div></div>
+      </div>
+      <div class="seg"><h4>Placares mais prováveis</h4><div class="chips">
+        ${P.top.map(t=>`<span class="chip"><b>${t[0]}–${t[1]}</b><span class="pc">${pct(t[2])}%</span></span>`).join('')}
+      </div></div>
+      <div class="seg"><h4>Prováveis goleadores</h4><div class="scorers">
+        ${allSc.map(s=>`<div class="sc"><span class="who">${s[1]} <span>${FLAG[s[0]]}</span></span><span class="pb"><span class="pf" style="width:${pct(s[2])}%"></span></span><span class="pct">${pct(s[2])}%</span></div>`).join('')}
+      </div></div>
+    </div>`;
+}
+
+// ==================== PANEL UI ====================
 let activeDate=DATES.find(d=>d>="2026-06-11")||DATES[0];
 const $=id=>document.getElementById(id);
 const pct=x=>Math.round(x*100);
 const dayDone=d=>FIX.filter(f=>f[1]===d).every(f=>RESULTS[f[0]]);
 
+function initPanel(){
+  renderDays();renderMatches();
+
+  $('editBtn').onclick=()=>openRates();
+  $('howBtn').onclick=()=>$('howScrim').classList.add('on');
+  $('howClose').onclick=()=>$('howScrim').classList.remove('on');
+  $('resetBtn').onclick=async()=>{R={...BASE};RESULTS={};await saveRatings();await saveResults();renderDays();renderMatches();};
+  $('rsearch').oninput=e=>renderRateList(e.target.value);
+  $('resSave').onclick=resSaveHandler;
+  $('resClear').onclick=resClearHandler;
+  document.querySelectorAll('.scrim').forEach(s=>s.onclick=e=>{if(e.target===s)s.classList.remove('on');});
+}
+
 function renderDays(){
   $('days').innerHTML=DATES.map(d=>{
     const f=FIX.find(x=>x[1]===d);
-    const cls=['day']; if(d===activeDate)cls.push('active'); if(dayDone(d))cls.push('done');
+    const cls=['day'];if(d===activeDate)cls.push('active');if(dayDone(d))cls.push('done');
     return `<div class="${cls.join(' ')}" data-d="${d}"><div class="dow">${f[3]}</div><div class="dnum">${f[2]}/06</div></div>`;
   }).join('');
   document.querySelectorAll('.day').forEach(el=>el.onclick=()=>{activeDate=el.dataset.d;renderDays();renderMatches();});
 }
 
-function bar(p){return `<div style="width:${p}%"></div>`;}
 function renderMatches(){
   const list=FIX.filter(f=>f[1]===activeDate);
   if(!list.length){$('matches').innerHTML='<div class="empty">Sem jogos neste dia.</div>';return;}
@@ -357,7 +711,7 @@ function renderMatches(){
     const [id,,,,grp,h,a]=f;
     const P=predict(h,a);
     const res=RESULTS[id];
-    const scH=scorers(h,P.lt), scA=scorers(a,P.lo);
+    const scH=scorers(h,P.lt),scA=scorers(a,P.lo);
     const allSc=[...scH.map(s=>[h,...s]),...scA.map(s=>[a,...s])].sort((x,y)=>y[2]-x[2]).slice(0,3);
     return `<div class="card">
       <div class="ctop"><span class="grp">GRUPO ${grp}</span><span>${res?'✓ resultado lançado':'previsão do modelo'}</span></div>
@@ -393,7 +747,6 @@ function renderMatches(){
   document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openRates(b.dataset.edit.split('|')));
 }
 
-//----- Ratings sheet -----
 function rateRow(team){
   return `<div class="ratectl" data-team="${team}">
     <span class="fl">${FLAG[team]}</span><span class="nm">${team}</span>
@@ -407,10 +760,10 @@ function renderRateList(filter='',only=null){
   if(filter)teams=teams.filter(t=>t.toLowerCase().includes(filter.toLowerCase()));
   $('rateList').innerHTML=teams.map(rateRow).join('');
   document.querySelectorAll('#rateList .stp').forEach(b=>b.onclick=()=>{
-    const row=b.closest('.ratectl'), t=row.dataset.team;
+    const row=b.closest('.ratectl'),t=row.dataset.team;
     R[t]=Math.round(R[t]+parseInt(b.dataset.d));
     row.querySelector('.val').textContent=Math.round(R[t]);
-    saveRatings(); renderMatches();
+    saveRatings();renderMatches();
   });
 }
 function openRates(only=null){
@@ -419,60 +772,58 @@ function openRates(only=null){
   renderRateList('',only);
   $('rateScrim').classList.add('on');
 }
-$('rsearch').oninput=e=>renderRateList(e.target.value);
 
-//----- Result sheet -----
 let curRes=null;
 function openResult(id){
-  const f=FIX.find(x=>x[0]===id); curRes=f;
+  const f=FIX.find(x=>x[0]===id);curRes=f;
   const [,,,,, h,a]=f;
   $('resTitle').textContent=`${h} x ${a}`;
   $('resHomeFl').textContent=FLAG[h];$('resHomeNm').textContent=h;
   $('resAwayFl').textContent=FLAG[a];$('resAwayNm').textContent=a;
   const r=RESULTS[id];
-  $('resHome').value=r?r.hs:''; $('resAway').value=r?r.as:'';
+  $('resHome').value=r?r.hs:'';$('resAway').value=r?r.as:'';
   $('resScrim').classList.add('on');
 }
-$('resSave').onclick=()=>{
-  const hs=parseInt($('resHome').value), as=parseInt($('resAway').value);
-  if(isNaN(hs)||isNaN(as)){return;}
-  const id=curRes[0], h=curRes[5], a=curRes[6];
-  if(RESULTS[id]){ // desfaz o nudge anterior antes de reaplicar
-    R={...BASE}; // recomeça das bases
-    // reaplica todos os resultados exceto o atual, depois o novo
+function resSaveHandler(){
+  const hs=parseInt($('resHome').value),as=parseInt($('resAway').value);
+  if(isNaN(hs)||isNaN(as))return;
+  const id=curRes[0],h=curRes[5],a=curRes[6];
+  if(RESULTS[id]){
+    R={...BASE};
     const others=Object.entries(RESULTS).filter(([k])=>k!==id);
-    // mantém ajustes manuais? simplificação: ao editar resultado, ratings voltam à base + todos os resultados
     for(const [k,v] of others){const ff=FIX.find(x=>x[0]===k);applyElo(ff[5],ff[6],v.hs,v.as);}
   }
   applyElo(h,a,hs,as);
   RESULTS[id]={hs,as};
-  saveRatings(); saveResults();
+  saveRatings();saveResults();
   $('resScrim').classList.remove('on');
-  renderDays(); renderMatches();
-};
-$('resClear').onclick=()=>{
+  renderDays();renderMatches();
+}
+function resClearHandler(){
   const id=curRes[0];
   if(RESULTS[id]){
     delete RESULTS[id];
     R={...BASE};
     for(const [k,v] of Object.entries(RESULTS)){const ff=FIX.find(x=>x[0]===k);applyElo(ff[5],ff[6],v.hs,v.as);}
-    saveRatings(); saveResults();
+    saveRatings();saveResults();
   }
   $('resScrim').classList.remove('on');
-  renderDays(); renderMatches();
-};
+  renderDays();renderMatches();
+}
 
-//----- buttons -----
-$('editBtn').onclick=()=>openRates();
-$('howBtn').onclick=()=>$('howScrim').classList.add('on');
-$('howClose').onclick=()=>$('howScrim').classList.remove('on');
-$('resetBtn').onclick=async()=>{
-  R={...BASE}; RESULTS={};
-  await saveRatings(); await saveResults();
-  renderDays(); renderMatches();
-};
-document.querySelectorAll('.scrim').forEach(s=>s.onclick=e=>{if(e.target===s)s.classList.remove('on');});
+// Animated dots sync
+(function(){
+  const dots=document.querySelectorAll('.slide-dots span');
+  let i=0;
+  setInterval(()=>{
+    dots.forEach(d=>d.classList.remove('active'));
+    i=(i+1)%dots.length;
+    dots[i].classList.add('active');
+  },5000);
+})();
 
-//----- boot -----
-(async()=>{ await loadState(); renderDays(); renderMatches(); })();
+// Boot
+boot();
 </script>
+</body>
+</html>
