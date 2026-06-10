@@ -1,0 +1,478 @@
+<!-- Painel de Previsão — Copa do Mundo 2026 -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@700&display=swap');
+
+  :root{
+    --ink:#0E1726; --panel:#16223A; --panel2:#1E2E4D; --line:#2A3C5E;
+    --pitch:#2BD96A; --flood:#F5B433; --slate:#7C8BA6; --loss:#FF5A6E;
+    --text:#E8EEF7; --dim:#9DB0CC;
+    --r:14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0;background:var(--ink);color:var(--text);font-family:'Inter',sans-serif;line-height:1.45;}
+  #app{max-width:760px;margin:0 auto;padding:16px 14px 60px;}
+
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .ttl{font-family:'Archivo Narrow',sans-serif;font-weight:700;font-size:26px;letter-spacing:.3px;line-height:1.05;}
+  .ttl .flood{color:var(--flood);}
+  .sub{color:var(--dim);font-size:12.5px;margin:2px 0 14px;}
+  .btn{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;
+       padding:8px 11px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .btn:active{transform:scale(.97);}
+  .btn.flood{background:var(--flood);color:#1a1300;border-color:var(--flood);}
+  .toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+
+  /* date chips */
+  .days{display:flex;gap:7px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none;}
+  .days::-webkit-scrollbar{display:none;}
+  .day{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);border-radius:11px;
+       padding:7px 11px;text-align:center;cursor:pointer;min-width:58px;}
+  .day .dow{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;}
+  .day .dnum{font-family:'Archivo Narrow';font-weight:700;font-size:17px;}
+  .day.active{background:var(--flood);border-color:var(--flood);}
+  .day.active .dow,.day.active .dnum{color:#1a1300;}
+  .day.done{border-color:var(--pitch);}
+
+  /* match card */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+  .ctop{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);margin-bottom:10px;}
+  .grp{background:var(--panel2);border-radius:6px;padding:2px 7px;font-weight:600;letter-spacing:.4px;}
+  .score-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;}
+  .team{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .team .fl{font-size:30px;line-height:1;}
+  .team .nm{font-family:'Archivo Narrow';font-weight:700;font-size:15px;text-align:center;}
+  .board{font-family:'Space Mono';font-weight:700;font-size:34px;letter-spacing:1px;
+         background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 14px;white-space:nowrap;}
+  .actual{color:var(--pitch);font-size:11px;text-align:center;margin-top:6px;font-weight:600;}
+
+  /* confidence bar */
+  .conf{margin:13px 0 4px;}
+  .conf .bar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--ink);}
+  .conf .w{background:var(--pitch);} .conf .d{background:var(--slate);} .conf .l{background:var(--loss);}
+  .conf .lbls{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-top:5px;}
+  .conf .lbls b{color:var(--text);font-weight:600;}
+
+  .stats{display:flex;gap:6px;margin-top:11px;}
+  .stat{flex:1;background:var(--ink);border-radius:9px;padding:7px 4px;text-align:center;}
+  .stat .v{font-family:'Space Mono';font-weight:700;font-size:14px;}
+  .stat .k{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.3px;margin-top:1px;}
+
+  .seg{margin-top:12px;}
+  .seg h4{font-size:10.5px;color:var(--flood);text-transform:uppercase;letter-spacing:.7px;margin:0 0 6px;font-weight:700;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 9px;font-size:12px;}
+  .chip b{font-family:'Space Mono';}
+  .chip .pc{color:var(--dim);font-size:10.5px;margin-left:3px;}
+
+  .scorers{display:flex;flex-direction:column;gap:5px;}
+  .sc{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;}
+  .sc .who{color:var(--text);} .sc .who span{color:var(--dim);font-size:11px;}
+  .sc .pb{flex:0 0 96px;height:6px;background:var(--ink);border-radius:4px;margin-left:10px;overflow:hidden;}
+  .sc .pf{height:100%;background:var(--flood);}
+  .sc .pct{flex:0 0 38px;text-align:right;font-family:'Space Mono';font-weight:700;font-size:12px;}
+
+  .actions{display:flex;gap:8px;margin-top:13px;}
+  .actions .btn{flex:1;text-align:center;}
+
+  .empty{color:var(--dim);text-align:center;padding:30px 10px;font-size:13px;}
+  .note{font-size:11px;color:var(--slate);margin-top:18px;text-align:center;line-height:1.5;}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(6,11,20,.72);display:none;align-items:flex-end;justify-content:center;z-index:50;}
+  .scrim.on{display:flex;}
+  .sheet{background:var(--panel);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:760px;
+         max-height:82vh;overflow-y:auto;padding:18px 16px 26px;}
+  .sheet h3{font-family:'Archivo Narrow';font-weight:700;font-size:20px;margin:0 0 3px;}
+  .sheet .sd{color:var(--dim);font-size:12px;margin-bottom:16px;}
+  .ratectl{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .ratectl .fl{font-size:24px;}
+  .ratectl .nm{flex:1;font-weight:600;font-size:14px;}
+  .ratectl .stp{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);
+                color:var(--text);font-size:18px;font-weight:700;cursor:pointer;}
+  .ratectl .val{width:58px;text-align:center;font-family:'Space Mono';font-weight:700;font-size:15px;
+                background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 0;}
+  .rsearch{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:10px;color:var(--text);
+           padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:14px;}
+  .resin{display:flex;gap:10px;align-items:center;justify-content:center;margin:14px 0;}
+  .resin input{width:62px;text-align:center;font-family:'Space Mono';font-weight:700;font-size:24px;
+               background:var(--ink);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:8px 0;}
+  .resin .x{font-family:'Archivo Narrow';font-size:18px;color:var(--dim);}
+  .full{width:100%;text-align:center;margin-top:6px;padding:12px;}
+</style>
+
+<div id="app">
+  <div class="head">
+    <div>
+      <div class="ttl">Painel <span class="flood">Copa 2026</span></div>
+    </div>
+    <button class="btn" id="resetBtn">Restaurar</button>
+  </div>
+  <div class="sub" id="subtitle">Modelo Poisson · força ajustável · recalibra a cada resultado lançado</div>
+
+  <div class="toolbar">
+    <button class="btn flood" id="editBtn">Ajustar seleções</button>
+    <button class="btn" id="howBtn">Como funciona</button>
+  </div>
+
+  <div class="days" id="days"></div>
+  <div id="matches"></div>
+
+  <div class="note">
+    Goleadores e placares são estimativas probabilísticas, não previsões garantidas — o placar mais provável costuma sair em ~10–14% dos jogos.
+    Use como referência. Aposte só o que pode perder.
+  </div>
+</div>
+
+<!-- Ratings sheet -->
+<div class="scrim" id="rateScrim">
+  <div class="sheet">
+    <h3>Ajustar força das seleções</h3>
+    <div class="sd">Suba a força de quem está em alta (forma, escalação cheia) e baixe de quem tem lesão/desfalque. As mudanças recalculam todos os jogos futuros e ficam salvas.</div>
+    <input class="rsearch" id="rsearch" placeholder="Buscar seleção...">
+    <div id="rateList"></div>
+  </div>
+</div>
+
+<!-- Result sheet -->
+<div class="scrim" id="resScrim">
+  <div class="sheet">
+    <h3 id="resTitle">Lançar resultado</h3>
+    <div class="sd">Digite o placar final do jogo. O modelo ajusta a força das duas seleções com base no desempenho (resultado + diferença de gols) e recalibra os próximos jogos.</div>
+    <div class="resin">
+      <div style="text-align:center"><div id="resHomeFl" style="font-size:26px"></div><div id="resHomeNm" style="font-size:12px;color:var(--dim)"></div></div>
+      <input id="resHome" type="number" min="0" inputmode="numeric">
+      <span class="x">x</span>
+      <input id="resAway" type="number" min="0" inputmode="numeric">
+      <div style="text-align:center"><div id="resAwayFl" style="font-size:26px"></div><div id="resAwayNm" style="font-size:12px;color:var(--dim)"></div></div>
+    </div>
+    <button class="btn flood full" id="resSave">Salvar e recalibrar</button>
+    <button class="btn full" id="resClear">Apagar resultado</button>
+  </div>
+</div>
+
+<!-- How sheet -->
+<div class="scrim" id="howScrim">
+  <div class="sheet">
+    <h3>Como funciona o painel</h3>
+    <div class="sd" style="line-height:1.6">
+      <b style="color:var(--text)">O motor</b> é um modelo Poisson com correção Dixon-Coles. Cada seleção tem uma nota de força (base: ranking FIFA de abr/2026 já ajustado pelos amistosos de junho). A diferença de força vira gols esperados (xG), e a distribuição de Poisson dá a chance de cada placar.<br><br>
+      <b style="color:var(--text)">A barra colorida</b> mostra a probabilidade de vitória do mandante (verde) / empate (cinza) / vitória do visitante (vermelho).<br><br>
+      <b style="color:var(--text)">Ajustar seleções:</b> mude a nota de força à mão quando souber de lesão, escalação ou forma. Tudo recalcula na hora.<br><br>
+      <b style="color:var(--text)">Lançar resultado:</b> depois de cada jogo, registre o placar real. O modelo nudge a força das duas seleções (estilo Elo, considerando a diferença de gols) — é assim que o "desempenho no jogo anterior" entra no cálculo dos próximos.<br><br>
+      <b style="color:var(--text)">Goleadores:</b> chance de marcar a qualquer momento, estimada a partir do xG do time e do peso ofensivo de cada jogador. É aproximação, não cravada.
+    </div>
+    <button class="btn flood full" id="howClose">Entendi</button>
+  </div>
+</div>
+
+<script>
+//==================== DADOS ====================
+const HOSTS = new Set(["México","EUA","Canadá"]);
+const BASE = {
+ "México":1691,"África do Sul":1430,"Coreia do Sul":1575,"Tchéquia":1490,
+ "Canadá":1500,"Bósnia":1420,"Catar":1450,"Suíça":1649,
+ "Brasil":1736,"Marrocos":1756,"Escócia":1490,"Haiti":1340,
+ "EUA":1663,"Paraguai":1480,"Austrália":1530,"Turquia":1560,
+ "Alemanha":1730,"Curaçao":1375,"Costa do Marfim":1520,"Equador":1570,
+ "Holanda":1758,"Japão":1660,"Suécia":1490,"Tunísia":1460,
+ "Bélgica":1750,"Egito":1520,"Irã":1630,"Nova Zelândia":1295,
+ "Espanha":1876,"Cabo Verde":1390,"Arábia Saudita":1430,"Uruguai":1673,
+ "França":1877,"Senegal":1689,"Iraque":1410,"Noruega":1570,
+ "Argentina":1875,"Argélia":1500,"Áustria":1560,"Jordânia":1390,
+ "Portugal":1764,"RD Congo":1490,"Uzbequistão":1430,"Colômbia":1693,
+ "Inglaterra":1816,"Croácia":1717,"Gana":1450,"Panamá":1470
+};
+const FLAG = {
+ "México":"🇲🇽","África do Sul":"🇿🇦","Coreia do Sul":"🇰🇷","Tchéquia":"🇨🇿","Canadá":"🇨🇦","Bósnia":"🇧🇦",
+ "Catar":"🇶🇦","Suíça":"🇨🇭","Brasil":"🇧🇷","Marrocos":"🇲🇦","Escócia":"🏴","Haiti":"🇭🇹","EUA":"🇺🇸",
+ "Paraguai":"🇵🇾","Austrália":"🇦🇺","Turquia":"🇹🇷","Alemanha":"🇩🇪","Curaçao":"🇨🇼","Costa do Marfim":"🇨🇮",
+ "Equador":"🇪🇨","Holanda":"🇳🇱","Japão":"🇯🇵","Suécia":"🇸🇪","Tunísia":"🇹🇳","Bélgica":"🇧🇪","Egito":"🇪🇬",
+ "Irã":"🇮🇷","Nova Zelândia":"🇳🇿","Espanha":"🇪🇸","Cabo Verde":"🇨🇻","Arábia Saudita":"🇸🇦","Uruguai":"🇺🇾",
+ "França":"🇫🇷","Senegal":"🇸🇳","Iraque":"🇮🇶","Noruega":"🇳🇴","Argentina":"🇦🇷","Argélia":"🇩🇿","Áustria":"🇦🇹",
+ "Jordânia":"🇯🇴","Portugal":"🇵🇹","RD Congo":"🇨🇩","Uzbequistão":"🇺🇿","Colômbia":"🇨🇴","Inglaterra":"🏴",
+ "Croácia":"🇭🇷","Gana":"🇬🇭","Panamá":"🇵🇦"
+};
+const SCORERS = {
+ "México":[["Santiago Giménez",.32],["Raúl Jiménez",.30],["Hirving Lozano",.18]],
+ "África do Sul":[["Lyle Foster",.35],["Percy Tau",.22]],
+ "Coreia do Sul":[["Son Heung-min",.38],["Oh Hyeon-gyu",.20],["Hwang Hee-chan",.18]],
+ "Tchéquia":[["Patrik Schick",.40],["Adam Hložek",.20]],
+ "Canadá":[["Jonathan David",.40],["Cyle Larin",.22],["Tajon Buchanan",.16]],
+ "Bósnia":[["Edin Džeko",.38],["Ermedin Demirović",.22]],
+ "Catar":[["Almoez Ali",.40],["Akram Afif",.25]],
+ "Suíça":[["Breel Embolo",.32],["Dan Ndoye",.22],["Zeki Amdouni",.20]],
+ "Brasil":[["Vinícius Jr",.30],["Raphinha",.26],["Matheus Cunha",.20],["Neymar",.18]],
+ "Marrocos":[["Youssef En-Nesyri",.34],["Brahim Díaz",.20],["Achraf Hakimi",.16]],
+ "Escócia":[["Che Adams",.30],["John McGinn",.20]],
+ "Haiti":[["Frantzdy Pierrot",.35],["Duckens Nazon",.22]],
+ "EUA":[["Christian Pulisic",.30],["Folarin Balogun",.30],["Ricardo Pepi",.20]],
+ "Paraguai":[["Antonio Sanabria",.30],["Miguel Almirón",.22],["Julio Enciso",.20]],
+ "Austrália":[["Mitchell Duke",.28],["Kusini Yengi",.22]],
+ "Turquia":[["Kenan Yıldız",.28],["Arda Güler",.22],["Hakan Çalhanoğlu",.18]],
+ "Alemanha":[["Kai Havertz",.28],["Florian Wirtz",.26],["Jamal Musiala",.24]],
+ "Curaçao":[["Tahith Chong",.30],["Gervane Kastaneer",.25]],
+ "Costa do Marfim":[["Sébastien Haller",.32],["Simon Adingra",.22],["Amad Diallo",.22]],
+ "Equador":[["Enner Valencia",.34],["Kendry Páez",.20]],
+ "Holanda":[["Cody Gakpo",.30],["Memphis Depay",.28],["Xavi Simons",.20]],
+ "Japão":[["Ayase Ueda",.30],["Kaoru Mitoma",.24],["Takefusa Kubo",.22]],
+ "Suécia":[["Alexander Isak",.34],["Viktor Gyökeres",.30]],
+ "Tunísia":[["Youssef Msakni",.28],["Hannibal Mejbri",.20]],
+ "Bélgica":[["Romelu Lukaku",.38],["Jérémy Doku",.22],["Kevin De Bruyne",.18]],
+ "Egito":[["Mohamed Salah",.42],["Omar Marmoush",.26]],
+ "Irã":[["Mehdi Taremi",.38],["Sardar Azmoun",.24]],
+ "Nova Zelândia":[["Chris Wood",.42],["Ben Waine",.18]],
+ "Espanha":[["Mikel Oyarzabal",.28],["Lamine Yamal",.26],["Ferran Torres",.24]],
+ "Cabo Verde":[["Garry Rodrigues",.28],["Bebé",.22]],
+ "Arábia Saudita":[["Salem Al-Dawsari",.32],["Firas Al-Buraikan",.26]],
+ "Uruguai":[["Darwin Núñez",.36],["Federico Valverde",.20],["Facundo Pellistri",.18]],
+ "França":[["Kylian Mbappé",.40],["Ousmane Dembélé",.24],["Michael Olise",.20]],
+ "Senegal":[["Nicolas Jackson",.30],["Ismaïla Sarr",.26],["Sadio Mané",.20]],
+ "Iraque":[["Aymen Hussein",.34],["Ali Jasim",.22]],
+ "Noruega":[["Erling Haaland",.48],["Alexander Sørloth",.22],["Martin Ødegaard",.18]],
+ "Argentina":[["Julián Álvarez",.30],["Lautaro Martínez",.28],["Lionel Messi",.26]],
+ "Argélia":[["Mohamed Amoura",.30],["Riyad Mahrez",.26],["Baghdad Bounedjah",.18]],
+ "Áustria":[["Marko Arnautović",.28],["Michael Gregoritsch",.24]],
+ "Jordânia":[["Yazan Al-Naimat",.30],["Mousa Al-Tamari",.26]],
+ "Portugal":[["Cristiano Ronaldo",.36],["Rafael Leão",.22],["Bruno Fernandes",.20]],
+ "RD Congo":[["Cédric Bakambu",.32],["Yoane Wissa",.26]],
+ "Uzbequistão":[["Eldor Shomurodov",.38],["Abbosbek Fayzullaev",.22]],
+ "Colômbia":[["Luis Díaz",.32],["Jhon Durán",.26],["James Rodríguez",.18]],
+ "Inglaterra":[["Harry Kane",.42],["Bukayo Saka",.24],["Jude Bellingham",.22]],
+ "Croácia":[["Andrej Kramarić",.28],["Bruno Petković",.24]],
+ "Gana":[["Iñaki Williams",.30],["Mohammed Kudus",.26],["Jordan Ayew",.18]],
+ "Panamá":[["José Fajardo",.30],["Ismael Díaz",.24]]
+};
+// id, data ISO, rótulo dia, dow, grupo, mandante, visitante
+const FIX = [
+ ["m01","2026-06-11","11","QUI","A","México","África do Sul"],["m02","2026-06-11","11","QUI","A","Coreia do Sul","Tchéquia"],
+ ["m03","2026-06-12","12","SEX","B","Canadá","Bósnia"],["m04","2026-06-12","12","SEX","D","EUA","Paraguai"],
+ ["m05","2026-06-13","13","SÁB","B","Catar","Suíça"],["m06","2026-06-13","13","SÁB","C","Brasil","Marrocos"],["m07","2026-06-13","13","SÁB","C","Haiti","Escócia"],["m08","2026-06-13","13","SÁB","D","Austrália","Turquia"],
+ ["m09","2026-06-14","14","DOM","E","Alemanha","Curaçao"],["m10","2026-06-14","14","DOM","F","Holanda","Japão"],["m11","2026-06-14","14","DOM","E","Costa do Marfim","Equador"],["m12","2026-06-14","14","DOM","F","Suécia","Tunísia"],
+ ["m13","2026-06-15","15","SEG","H","Espanha","Cabo Verde"],["m14","2026-06-15","15","SEG","G","Bélgica","Egito"],["m15","2026-06-15","15","SEG","H","Arábia Saudita","Uruguai"],["m16","2026-06-15","15","SEG","G","Irã","Nova Zelândia"],
+ ["m17","2026-06-16","16","TER","I","França","Senegal"],["m18","2026-06-16","16","TER","I","Iraque","Noruega"],["m19","2026-06-16","16","TER","J","Argentina","Argélia"],["m20","2026-06-16","16","TER","J","Áustria","Jordânia"],
+ ["m21","2026-06-17","17","QUA","K","Portugal","RD Congo"],["m22","2026-06-17","17","QUA","L","Inglaterra","Croácia"],["m23","2026-06-17","17","QUA","L","Gana","Panamá"],["m24","2026-06-17","17","QUA","K","Uzbequistão","Colômbia"],
+ ["m25","2026-06-18","18","QUI","A","Tchéquia","África do Sul"],["m26","2026-06-18","18","QUI","B","Suíça","Bósnia"],["m27","2026-06-18","18","QUI","B","Canadá","Catar"],["m28","2026-06-18","18","QUI","A","México","Coreia do Sul"],
+ ["m29","2026-06-19","19","SEX","D","EUA","Austrália"],["m30","2026-06-19","19","SEX","C","Escócia","Marrocos"],["m31","2026-06-19","19","SEX","C","Brasil","Haiti"],["m32","2026-06-19","19","SEX","D","Turquia","Paraguai"],
+ ["m33","2026-06-20","20","SÁB","F","Holanda","Suécia"],["m34","2026-06-20","20","SÁB","E","Alemanha","Costa do Marfim"],["m35","2026-06-20","20","SÁB","E","Equador","Curaçao"],["m36","2026-06-20","20","SÁB","F","Tunísia","Japão"],
+ ["m37","2026-06-21","21","DOM","H","Espanha","Arábia Saudita"],["m38","2026-06-21","21","DOM","G","Bélgica","Irã"],["m39","2026-06-21","21","DOM","H","Uruguai","Cabo Verde"],["m40","2026-06-21","21","DOM","G","Nova Zelândia","Egito"],
+ ["m41","2026-06-22","22","SEG","J","Argentina","Áustria"],["m42","2026-06-22","22","SEG","I","França","Iraque"],["m43","2026-06-22","22","SEG","I","Noruega","Senegal"],["m44","2026-06-22","22","SEG","J","Jordânia","Argélia"],
+ ["m45","2026-06-23","23","TER","K","Portugal","Uzbequistão"],["m46","2026-06-23","23","TER","L","Inglaterra","Gana"],["m47","2026-06-23","23","TER","L","Panamá","Croácia"],["m48","2026-06-23","23","TER","K","Colômbia","RD Congo"],
+ ["m49","2026-06-24","24","QUA","B","Suíça","Canadá"],["m50","2026-06-24","24","QUA","B","Bósnia","Catar"],["m51","2026-06-24","24","QUA","C","Escócia","Brasil"],["m52","2026-06-24","24","QUA","C","Marrocos","Haiti"],["m53","2026-06-24","24","QUA","A","Tchéquia","México"],["m54","2026-06-24","24","QUA","A","África do Sul","Coreia do Sul"],
+ ["m55","2026-06-25","25","QUI","D","Turquia","EUA"],["m56","2026-06-25","25","QUI","D","Paraguai","Austrália"],["m57","2026-06-25","25","QUI","E","Equador","Alemanha"],["m58","2026-06-25","25","QUI","E","Curaçao","Costa do Marfim"],["m59","2026-06-25","25","QUI","F","Tunísia","Holanda"],["m60","2026-06-25","25","QUI","F","Japão","Suécia"],
+ ["m61","2026-06-26","26","SEX","G","Egito","Irã"],["m62","2026-06-26","26","SEX","G","Nova Zelândia","Bélgica"],["m63","2026-06-26","26","SEX","H","Uruguai","Espanha"],["m64","2026-06-26","26","SEX","H","Cabo Verde","Arábia Saudita"],
+ ["m65","2026-06-27","27","SÁB","I","Noruega","França"],["m66","2026-06-27","27","SÁB","I","Senegal","Iraque"],["m67","2026-06-27","27","SÁB","J","Jordânia","Argentina"],["m68","2026-06-27","27","SÁB","J","Argélia","Áustria"],["m69","2026-06-27","27","SÁB","K","Colômbia","Portugal"],["m70","2026-06-27","27","SÁB","K","RD Congo","Uzbequistão"],["m71","2026-06-27","27","SÁB","L","Croácia","Gana"],["m72","2026-06-27","27","SÁB","L","Panamá","Inglaterra"]
+];
+const DATES = [...new Set(FIX.map(f=>f[1]))];
+
+//==================== MODELO ====================
+const LEAGUE=1.35, HOME=0.20, SCALE=0.0030, RHO=-0.05, MAXG=7;
+const _f=[1,1,2,6,24,120,720,5040,40320];
+const pois=(k,l)=>Math.exp(-l)*Math.pow(l,k)/_f[k];
+function tau(x,y,lx,ly){
+  if(x===0&&y===0)return 1-lx*ly*RHO;
+  if(x===0&&y===1)return 1+lx*RHO;
+  if(x===1&&y===0)return 1+ly*RHO;
+  if(x===1&&y===1)return 1-RHO;
+  return 1;
+}
+function xg(t,o){
+  let lam=LEAGUE*Math.exp(SCALE*(R[t]-R[o]));
+  if(HOSTS.has(t)) lam*=(1+HOME);
+  return Math.max(0.15,lam);
+}
+function predict(t,o){
+  const lt=xg(t,o), lo=xg(o,t);
+  let M=[], sum=0;
+  for(let x=0;x<=MAXG;x++){M[x]=[];for(let y=0;y<=MAXG;y++){const p=pois(x,lt)*pois(y,lo)*tau(x,y,lt,lo);M[x][y]=p;sum+=p;}}
+  let pw=0,pd=0,pl=0,o25=0,btts=0,best=[0,0],bp=0,flat=[];
+  for(let x=0;x<=MAXG;x++)for(let y=0;y<=MAXG;y++){
+    const p=M[x][y]/sum;
+    if(x>y)pw+=p; else if(x===y)pd+=p; else pl+=p;
+    if(x+y>=3)o25+=p;
+    if(x>=1&&y>=1)btts+=p;
+    if(p>bp){bp=p;best=[x,y];}
+    flat.push([x,y,p]);
+  }
+  flat.sort((a,b)=>b[2]-a[2]);
+  return {lt,lo,pw,pd,pl,o25,btts,best,bp,top:flat.slice(0,4)};
+}
+function scorers(team,teamXG){
+  const list=SCORERS[team]||[["Atacante principal",.32]];
+  return list.map(([n,s])=>[n,1-Math.exp(-s*teamXG)]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+}
+
+//==================== ESTADO + PERSISTÊNCIA ====================
+let R={...BASE};
+let RESULTS={};
+const mem={};
+const store={
+  async get(k){
+    try{if(window.storage){const r=await window.storage.get(k);return r?r.value:null;}}catch(e){}
+    try{const v=localStorage.getItem(k);if(v!==null)return v;}catch(e){}
+    return mem[k]??null;
+  },
+  async set(k,v){
+    try{if(window.storage){await window.storage.set(k,v,false);return;}}catch(e){}
+    try{localStorage.setItem(k,v);return;}catch(e){}
+    mem[k]=v;
+  }
+};
+async function loadState(){
+  try{const r=await store.get('wc26_ratings'); if(r){const o=JSON.parse(r); R={...BASE,...o};}}catch(e){}
+  try{const r=await store.get('wc26_results'); if(r){RESULTS=JSON.parse(r);}}catch(e){}
+}
+async function saveRatings(){await store.set('wc26_ratings',JSON.stringify(R));}
+async function saveResults(){await store.set('wc26_results',JSON.stringify(RESULTS));}
+
+// Elo nudge a partir de resultado real
+function applyElo(h,a,hs,as){
+  const C=400,K=34;
+  const eh=1/(1+Math.pow(10,-(R[h]-R[a])/C)), ea=1-eh;
+  let sh,sa; if(hs>as){sh=1;sa=0;}else if(hs<as){sh=0;sa=1;}else{sh=.5;sa=.5;}
+  const gd=Math.abs(hs-as);
+  const G=gd<=1?1:gd===2?1.5:(11+gd)/8;
+  R[h]+=K*G*(sh-eh); R[a]+=K*G*(sa-ea);
+}
+
+//==================== UI ====================
+let activeDate=DATES.find(d=>d>="2026-06-11")||DATES[0];
+const $=id=>document.getElementById(id);
+const pct=x=>Math.round(x*100);
+const dayDone=d=>FIX.filter(f=>f[1]===d).every(f=>RESULTS[f[0]]);
+
+function renderDays(){
+  $('days').innerHTML=DATES.map(d=>{
+    const f=FIX.find(x=>x[1]===d);
+    const cls=['day']; if(d===activeDate)cls.push('active'); if(dayDone(d))cls.push('done');
+    return `<div class="${cls.join(' ')}" data-d="${d}"><div class="dow">${f[3]}</div><div class="dnum">${f[2]}/06</div></div>`;
+  }).join('');
+  document.querySelectorAll('.day').forEach(el=>el.onclick=()=>{activeDate=el.dataset.d;renderDays();renderMatches();});
+}
+
+function bar(p){return `<div style="width:${p}%"></div>`;}
+function renderMatches(){
+  const list=FIX.filter(f=>f[1]===activeDate);
+  if(!list.length){$('matches').innerHTML='<div class="empty">Sem jogos neste dia.</div>';return;}
+  $('matches').innerHTML=list.map(f=>{
+    const [id,,,,grp,h,a]=f;
+    const P=predict(h,a);
+    const res=RESULTS[id];
+    const scH=scorers(h,P.lt), scA=scorers(a,P.lo);
+    const allSc=[...scH.map(s=>[h,...s]),...scA.map(s=>[a,...s])].sort((x,y)=>y[2]-x[2]).slice(0,3);
+    return `<div class="card">
+      <div class="ctop"><span class="grp">GRUPO ${grp}</span><span>${res?'✓ resultado lançado':'previsão do modelo'}</span></div>
+      <div class="score-row">
+        <div class="team"><span class="fl">${FLAG[h]}</span><span class="nm">${h}</span></div>
+        <div class="board">${P.best[0]} : ${P.best[1]}</div>
+        <div class="team"><span class="fl">${FLAG[a]}</span><span class="nm">${a}</span></div>
+      </div>
+      ${res?`<div class="actual">Resultado real: ${res.hs} x ${res.as}</div>`:''}
+      <div class="conf">
+        <div class="bar"><span class="w" style="width:${pct(P.pw)}%"></span><span class="d" style="width:${pct(P.pd)}%"></span><span class="l" style="width:${pct(P.pl)}%"></span></div>
+        <div class="lbls"><span><b>${pct(P.pw)}%</b> ${h}</span><span><b>${pct(P.pd)}%</b> empate</span><span><b>${pct(P.pl)}%</b> ${a}</span></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="v">${P.lt.toFixed(1)}–${P.lo.toFixed(1)}</div><div class="k">gols esperados</div></div>
+        <div class="stat"><div class="v">${pct(P.o25)}%</div><div class="k">+2.5 gols</div></div>
+        <div class="stat"><div class="v">${pct(P.btts)}%</div><div class="k">ambas marcam</div></div>
+        <div class="stat"><div class="v">${pct(P.bp)}%</div><div class="k">chance do placar</div></div>
+      </div>
+      <div class="seg"><h4>Placares mais prováveis</h4><div class="chips">
+        ${P.top.map(t=>`<span class="chip"><b>${t[0]}–${t[1]}</b><span class="pc">${pct(t[2])}%</span></span>`).join('')}
+      </div></div>
+      <div class="seg"><h4>Prováveis goleadores</h4><div class="scorers">
+        ${allSc.map(s=>`<div class="sc"><span class="who">${s[1]} <span>${FLAG[s[0]]}</span></span><span class="pb"><span class="pf" style="width:${pct(s[2])}%"></span></span><span class="pct">${pct(s[2])}%</span></div>`).join('')}
+      </div></div>
+      <div class="actions">
+        <button class="btn" data-edit="${h}|${a}">Ajustar força</button>
+        <button class="btn flood" data-res="${id}">${res?'Editar resultado':'Lançar resultado'}</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('[data-res]').forEach(b=>b.onclick=()=>openResult(b.dataset.res));
+  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openRates(b.dataset.edit.split('|')));
+}
+
+//----- Ratings sheet -----
+function rateRow(team){
+  return `<div class="ratectl" data-team="${team}">
+    <span class="fl">${FLAG[team]}</span><span class="nm">${team}</span>
+    <button class="stp" data-d="-10">–</button>
+    <span class="val">${Math.round(R[team])}</span>
+    <button class="stp" data-d="10">+</button>
+  </div>`;
+}
+function renderRateList(filter='',only=null){
+  let teams=only||Object.keys(BASE).sort((a,b)=>R[b]-R[a]);
+  if(filter)teams=teams.filter(t=>t.toLowerCase().includes(filter.toLowerCase()));
+  $('rateList').innerHTML=teams.map(rateRow).join('');
+  document.querySelectorAll('#rateList .stp').forEach(b=>b.onclick=()=>{
+    const row=b.closest('.ratectl'), t=row.dataset.team;
+    R[t]=Math.round(R[t]+parseInt(b.dataset.d));
+    row.querySelector('.val').textContent=Math.round(R[t]);
+    saveRatings(); renderMatches();
+  });
+}
+function openRates(only=null){
+  $('rsearch').value='';
+  $('rsearch').style.display=only?'none':'block';
+  renderRateList('',only);
+  $('rateScrim').classList.add('on');
+}
+$('rsearch').oninput=e=>renderRateList(e.target.value);
+
+//----- Result sheet -----
+let curRes=null;
+function openResult(id){
+  const f=FIX.find(x=>x[0]===id); curRes=f;
+  const [,,,,, h,a]=f;
+  $('resTitle').textContent=`${h} x ${a}`;
+  $('resHomeFl').textContent=FLAG[h];$('resHomeNm').textContent=h;
+  $('resAwayFl').textContent=FLAG[a];$('resAwayNm').textContent=a;
+  const r=RESULTS[id];
+  $('resHome').value=r?r.hs:''; $('resAway').value=r?r.as:'';
+  $('resScrim').classList.add('on');
+}
+$('resSave').onclick=()=>{
+  const hs=parseInt($('resHome').value), as=parseInt($('resAway').value);
+  if(isNaN(hs)||isNaN(as)){return;}
+  const id=curRes[0], h=curRes[5], a=curRes[6];
+  if(RESULTS[id]){ // desfaz o nudge anterior antes de reaplicar
+    R={...BASE}; // recomeça das bases
+    // reaplica todos os resultados exceto o atual, depois o novo
+    const others=Object.entries(RESULTS).filter(([k])=>k!==id);
+    // mantém ajustes manuais? simplificação: ao editar resultado, ratings voltam à base + todos os resultados
+    for(const [k,v] of others){const ff=FIX.find(x=>x[0]===k);applyElo(ff[5],ff[6],v.hs,v.as);}
+  }
+  applyElo(h,a,hs,as);
+  RESULTS[id]={hs,as};
+  saveRatings(); saveResults();
+  $('resScrim').classList.remove('on');
+  renderDays(); renderMatches();
+};
+$('resClear').onclick=()=>{
+  const id=curRes[0];
+  if(RESULTS[id]){
+    delete RESULTS[id];
+    R={...BASE};
+    for(const [k,v] of Object.entries(RESULTS)){const ff=FIX.find(x=>x[0]===k);applyElo(ff[5],ff[6],v.hs,v.as);}
+    saveRatings(); saveResults();
+  }
+  $('resScrim').classList.remove('on');
+  renderDays(); renderMatches();
+};
+
+//----- buttons -----
+$('editBtn').onclick=()=>openRates();
+$('howBtn').onclick=()=>$('howScrim').classList.add('on');
+$('howClose').onclick=()=>$('howScrim').classList.remove('on');
+$('resetBtn').onclick=async()=>{
+  R={...BASE}; RESULTS={};
+  await saveRatings(); await saveResults();
+  renderDays(); renderMatches();
+};
+document.querySelectorAll('.scrim').forEach(s=>s.onclick=e=>{if(e.target===s)s.classList.remove('on');});
+
+//----- boot -----
+(async()=>{ await loadState(); renderDays(); renderMatches(); })();
+</script>
