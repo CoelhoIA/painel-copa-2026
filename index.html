@@ -170,6 +170,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .score-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;}
 .team{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .team .fl{font-size:30px;line-height:1;}
+.flg{width:44px;height:auto;border-radius:5px;box-shadow:0 1px 5px rgba(0,0,0,.45);vertical-align:middle;}
+.flg.sm{width:18px;border-radius:2px;box-shadow:none;}
+.ratectl .flg{width:30px;}
 .team .nm{font-family:'Archivo Narrow';font-weight:700;font-size:15px;text-align:center;}
 .board{font-family:'Space Mono';font-weight:700;font-size:34px;letter-spacing:1px;
   background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 14px;white-space:nowrap;}
@@ -594,6 +597,18 @@ const FLAG = {
  "Jordânia":"🇯🇴","Portugal":"🇵🇹","RD Congo":"🇨🇩","Uzbequistão":"🇺🇿","Colômbia":"🇨🇴","Inglaterra":"🏴",
  "Croácia":"🇭🇷","Gana":"🇬🇭","Panamá":"🇵🇦"
 };
+// Códigos ISO para as imagens de bandeira (flagcdn.com)
+const CC={
+ "México":"mx","África do Sul":"za","Coreia do Sul":"kr","Tchéquia":"cz","Canadá":"ca","Bósnia":"ba",
+ "Catar":"qa","Suíça":"ch","Brasil":"br","Marrocos":"ma","Escócia":"gb-sct","Haiti":"ht","EUA":"us",
+ "Paraguai":"py","Austrália":"au","Turquia":"tr","Alemanha":"de","Curaçao":"cw","Costa do Marfim":"ci",
+ "Equador":"ec","Holanda":"nl","Japão":"jp","Suécia":"se","Tunísia":"tn","Bélgica":"be","Egito":"eg",
+ "Irã":"ir","Nova Zelândia":"nz","Espanha":"es","Cabo Verde":"cv","Arábia Saudita":"sa","Uruguai":"uy",
+ "França":"fr","Senegal":"sn","Iraque":"iq","Noruega":"no","Argentina":"ar","Argélia":"dz","Áustria":"at",
+ "Jordânia":"jo","Portugal":"pt","RD Congo":"cd","Uzbequistão":"uz","Colômbia":"co","Inglaterra":"gb-eng",
+ "Croácia":"hr","Gana":"gh","Panamá":"pa"
+};
+const flagImg=(t,sm)=>`<img class="flg${sm?' sm':''}" src="https://flagcdn.com/${sm?'w20':'w80'}/${CC[t]||'un'}.png" alt="${t}" loading="lazy">`;
 const SCORERS = {
  "México":[["Raúl Jiménez",.34],["Julián Quiñones",.24],["Santiago Giménez",.20],["Roberto Alvarado",.16]],
  "África do Sul":[["Lyle Foster",.34],["Oswin Appollis",.22],["Relebohile Mofokeng",.20]],
@@ -932,9 +947,9 @@ function renderDemo(){
     <div class="card">
       <div class="ctop"><span class="grp">GRUPO ${grp}</span><span>previsão do modelo</span></div>
       <div class="score-row">
-        <div class="team"><span class="fl">${FLAG[h]}</span><span class="nm">${h}</span></div>
+        <div class="team"><span class="fl">${flagImg(h)}</span><span class="nm">${h}</span></div>
         <div class="board">${P.best[0]} : ${P.best[1]}</div>
-        <div class="team"><span class="fl">${FLAG[a]}</span><span class="nm">${a}</span></div>
+        <div class="team"><span class="fl">${flagImg(a)}</span><span class="nm">${a}</span></div>
       </div>
       <div class="conf">
         <div class="bar">
@@ -958,7 +973,7 @@ function renderDemo(){
         ${P.top.map(t=>`<span class="chip"><b>${t[0]}–${t[1]}</b><span class="pc">${pct(t[2])}%</span></span>`).join('')}
       </div></div>
       <div class="seg"><h4>Prováveis goleadores</h4><div class="scorers">
-        ${allSc.map(s=>`<div class="sc"><span class="who">${s[1]} <span>${FLAG[s[0]]}</span></span><span class="pb"><span class="pf" style="width:${pct(s[2])}%"></span></span><span class="pct">${pct(s[2])}%</span></div>`).join('')}
+        ${allSc.map(s=>`<div class="sc"><span class="who">${s[1]} ${flagImg(s[0],1)}</span><span class="pb"><span class="pf" style="width:${pct(s[2])}%"></span></span><span class="pct">${pct(s[2])}%</span></div>`).join('')}
       </div></div>
     </div>`;
 }
@@ -1011,9 +1026,9 @@ function renderMatches(){
     return `<div class="${cardCls}">
       <div class="ctop"><span class="grp">GRUPO ${grp}</span><span>${topLabel}</span></div>
       <div class="score-row">
-        <div class="team"><span class="fl">${FLAG[h]}</span><span class="nm">${h}</span></div>
+        <div class="team"><span class="fl">${flagImg(h)}</span><span class="nm">${h}</span></div>
         <div class="board">${P.best[0]} : ${P.best[1]}</div>
-        <div class="team"><span class="fl">${FLAG[a]}</span><span class="nm">${a}</span></div>
+        <div class="team"><span class="fl">${flagImg(a)}</span><span class="nm">${a}</span></div>
       </div>
       ${res?`<div class="actual">Resultado real: ${res.hs} x ${res.as}</div>`:''}
       <div class="conf">
@@ -1030,7 +1045,7 @@ function renderMatches(){
         ${P.top.map(t=>`<span class="chip"><b>${t[0]}–${t[1]}</b><span class="pc">${pct(t[2])}%</span></span>`).join('')}
       </div></div>
       <div class="seg"><h4>Prováveis goleadores</h4><div class="scorers">
-        ${allSc.map(s=>`<div class="sc"><span class="who">${s[1]} <span>${FLAG[s[0]]}</span></span><span class="pb"><span class="pf" style="width:${pct(s[2])}%"></span></span><span class="pct">${pct(s[2])}%</span></div>`).join('')}
+        ${allSc.map(s=>`<div class="sc"><span class="who">${s[1]} ${flagImg(s[0],1)}</span><span class="pb"><span class="pf" style="width:${pct(s[2])}%"></span></span><span class="pct">${pct(s[2])}%</span></div>`).join('')}
       </div></div>
       <div class="actions">
         <button class="btn" data-watch="${id}" title="Receber e-mail 1h antes do jogo">${WATCH.includes(id)?'🔔 Aviso ativado':'🔕 Avisar 1h antes'}</button>
@@ -1122,7 +1137,7 @@ function initAlerts(){
 
 function rateRow(team){
   return `<div class="ratectl" data-team="${team}">
-    <span class="fl">${FLAG[team]}</span><span class="nm">${team}</span>
+    <span class="fl">${flagImg(team)}</span><span class="nm">${team}</span>
     <button class="stp" data-d="-10">–</button>
     <span class="val">${Math.round(R[team])}</span>
     <button class="stp" data-d="10">+</button>
@@ -1151,8 +1166,8 @@ function openResult(id){
   const f=FIX.find(x=>x[0]===id);curRes=f;
   const [,,,,, h,a]=f;
   $('resTitle').textContent=`${h} x ${a}`;
-  $('resHomeFl').textContent=FLAG[h];$('resHomeNm').textContent=h;
-  $('resAwayFl').textContent=FLAG[a];$('resAwayNm').textContent=a;
+  $('resHomeFl').innerHTML=flagImg(h);$('resHomeNm').textContent=h;
+  $('resAwayFl').innerHTML=flagImg(a);$('resAwayNm').textContent=a;
   const r=RESULTS[id];
   $('resHome').value=r?r.hs:'';$('resAway').value=r?r.as:'';
   $('resScrim').classList.add('on');
